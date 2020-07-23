@@ -1,0 +1,10 @@
+kernel/*.d
+kernel/*.o
+kernel/*.asm
+kernel/kernel.sym
+kernel/kernel
+mkfs/r5o5_mkfs
+*.log
+getLogInfo
+information/prog_info
+fs.img
