@@ -1,0 +1,7 @@
+Requirements : riscv-unknown-elf-gdb toolchain (refer mit xv6 website)
+start qemu by using make qemu-gdb which will start it in debugging mode
+this will display the port number and it will wait by listening to the remote.
+from a remote shell, start riscv-unknown-elf-gdb console and connect to this port using remote target:<portname>
+now the formal connection will be established.
+some helpful commands are c to continue execution till next breakpoint, br * <mem_addr> to set breakpoint, info reg to show register status etc.
+more can be found out with the help of the internet, address of main() can be found from kernel/kernel.asm.

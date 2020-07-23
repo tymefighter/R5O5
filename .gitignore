@@ -1,0 +1,6 @@
+kernel/*.d
+kernel/*.o
+mkfs/r5o5_mkfs
+*.log
+getLogInfo
+information/*
