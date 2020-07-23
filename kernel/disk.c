@@ -1,0 +1,203 @@
+#include "declarations.h"
+#include "functions.h"
+
+void diskInit(void) {
+    uint32 status = 0;
+
+    if(*RVIRT(VIRTIO_MMIO_MAGIC_VALUE) != 0x74726976 ||
+        *RVIRT(VIRTIO_MMIO_VERSION) != 1 ||
+        *RVIRT(VIRTIO_MMIO_DEVICE_ID) != 2 ||
+        *RVIRT(VIRTIO_MMIO_VENDOR_ID) != 0x554d4551){
+        error("could not find disk");
+    }
+
+    status |= VIRTIO_CONFIG_S_ACKNOWLEDGE;
+    *RVIRT(VIRTIO_MMIO_STATUS) = status;
+
+    status |= VIRTIO_CONFIG_S_DRIVER;
+    *RVIRT(VIRTIO_MMIO_STATUS) = status;
+
+    // negotiate features
+    uint64 features = *RVIRT(VIRTIO_MMIO_DEVICE_FEATURES);
+    features &= ~(1 << VIRTIO_BLK_F_RO);
+    features &= ~(1 << VIRTIO_BLK_F_SCSI);
+    features &= ~(1 << VIRTIO_BLK_F_CONFIG_WCE);
+    features &= ~(1 << VIRTIO_BLK_F_MQ);
+    features &= ~(1 << VIRTIO_F_ANY_LAYOUT);
+    features &= ~(1 << VIRTIO_RING_F_EVENT_IDX);
+    features &= ~(1 << VIRTIO_RING_F_INDIRECT_DESC);
+    *RVIRT(VIRTIO_MMIO_DRIVER_FEATURES) = features;
+
+    // tell device that feature negotiation is complete.
+    status |= VIRTIO_CONFIG_S_FEATURES_OK;
+    *RVIRT(VIRTIO_MMIO_STATUS) = status;
+
+    // tell device we're completely ready.
+    status |= VIRTIO_CONFIG_S_DRIVER_OK;
+    *RVIRT(VIRTIO_MMIO_STATUS) = status;
+
+    *RVIRT(VIRTIO_MMIO_GUEST_PAGE_SIZE) = PGSIZE;
+
+    // initialize queue 0.
+    *RVIRT(VIRTIO_MMIO_QUEUE_SEL) = 0;
+    uint32 max = *RVIRT(VIRTIO_MMIO_QUEUE_NUM_MAX);
+    if(max == 0)
+        error("virtio disk has no queue 0");
+
+    if(max < NUM)
+        error("virtio disk max queue too short");
+
+    *RVIRT(VIRTIO_MMIO_QUEUE_NUM) = NUM;
+    memset(disk.pages, 0, sizeof(disk.pages));
+    *RVIRT(VIRTIO_MMIO_QUEUE_PFN) = ((uint64)disk.pages) >> PGSHIFT;
+
+    // desc = pages -- num * VRingDesc
+    // avail = pages + 0x40 -- 2 * uint16, then num * uint16
+    // used = pages + 4096 -- 2 * uint16, then num * vRingUsedElem
+
+    disk.desc = (struct VRingDesc *) disk.pages;
+    disk.avail = (uint16*)(((char*)disk.desc) + NUM*sizeof(struct VRingDesc));
+    disk.used = (struct UsedArea *) (disk.pages + PGSIZE);
+
+    for(int i = 0; i < NUM; i++)
+    disk.free[i] = 1;
+
+    // plic.c and trap.c arrange for interrupts from VIRTIO0_IRQ.
+}
+
+// find a free descriptor, mark it non-free, return its index.
+static int allocDesc() {
+    for(int i = 0; i < NUM; i++){
+        if(disk.free[i]){
+            disk.free[i] = 0;
+            return i;
+        }
+    }
+    return -1;
+}
+
+// mark a descriptor as free.
+static void freeDesc(int i) {
+  if(i >= NUM)
+    error("diskIntr 1");
+
+  if(disk.free[i])
+    error("diskIntr 2");
+
+  disk.desc[i].addr = 0;
+  disk.free[i] = 1;
+}
+
+// free a chain of descriptors.
+static void freeChain(int i) {
+    while(1) {
+        freeDesc(i);
+        if(disk.desc[i].flags & VRING_DESC_F_NEXT)
+            i = disk.desc[i].next;
+        else
+            break;
+    }
+}
+
+static int alloc3_desc(int *idx) {
+    for(int i = 0; i < 3; i++) {
+        idx[i] = allocDesc();
+        if(idx[i] < 0){
+            for(int j = 0; j < i; j++)
+                freeDesc(idx[j]);
+            return -1;
+        }
+    }
+  return 0;
+}
+
+void diskRW(Buffer *b, int write) {
+    uint64 sector = b->blockno * (BSIZE / 512);
+
+    // the spec says that legacy block operations use three
+    // descriptors: one for type/reserved/sector, one for
+    // the data, one for a 1-byte status result.
+
+    // allocate the three descriptors.
+    int idx[3];
+    while(1){
+        if(alloc3_desc(idx) == 0) {
+            break;
+        }
+    }
+  
+    // format the three descriptors.
+    // qemu's virtio-blk.c reads them.
+
+    struct virtio_blk_outhdr {
+        uint32 type;
+        uint32 reserved;
+        uint64 sector;
+    } buf0;
+
+    if(write)
+        buf0.type = VIRTIO_BLK_T_OUT; // write the disk
+    else
+        buf0.type = VIRTIO_BLK_T_IN; // read the disk
+    buf0.reserved = 0;
+    buf0.sector = sector;
+
+    // buf0 is on a kernel stack, which is not direct mapped,
+    // thus the call to kvmpa().
+    // disk.desc[idx[0]].addr = (uint64) kvmpa((uint64) &buf0);
+    disk.desc[idx[0]].addr = (uint64) &buf0;
+    disk.desc[idx[0]].len = sizeof(buf0);
+    disk.desc[idx[0]].flags = VRING_DESC_F_NEXT;
+    disk.desc[idx[0]].next = idx[1];
+
+    disk.desc[idx[1]].addr = (uint64) b->data;
+    disk.desc[idx[1]].len = BSIZE;
+    if(write)
+        disk.desc[idx[1]].flags = 0; // device reads b->data
+    else
+        disk.desc[idx[1]].flags = VRING_DESC_F_WRITE; // device writes b->data
+    disk.desc[idx[1]].flags |= VRING_DESC_F_NEXT;
+    disk.desc[idx[1]].next = idx[2];
+
+    disk.info[idx[0]].status = 0;
+    disk.desc[idx[2]].addr = (uint64) &disk.info[idx[0]].status;
+    disk.desc[idx[2]].len = 1;
+    disk.desc[idx[2]].flags = VRING_DESC_F_WRITE; // device writes the status
+    disk.desc[idx[2]].next = 0;
+
+    // record struct buf for diskIntr().
+    b->disk = 1;
+    disk.info[idx[0]].b = b;
+
+    // avail[0] is flags
+    // avail[1] tells the device how far to look in avail[2...].
+    // avail[2...] are desc[] indices the device should process.
+    // we only tell device the first index in our chain of descriptors.
+    disk.avail[2 + (disk.avail[1] % NUM)] = idx[0];
+    // __sync_synchronize();
+    disk.avail[1] = disk.avail[1] + 1;
+
+    *RVIRT(VIRTIO_MMIO_QUEUE_NOTIFY) = 0; // value is queue number
+
+    // Wait for diskIntr() to say request has finished.
+
+    intr_dev_on();
+    asm("wfi");
+    intr_all_off();
+
+    disk.info[idx[0]].b = 0;
+    freeChain(idx[0]);
+}
+
+void diskIntr() {
+    while((disk.used_idx % NUM) != (disk.used->id % NUM)) {
+        int id = disk.used->elems[disk.used_idx].id;
+
+        if(disk.info[id].status != 0)
+        error("diskIntr status");
+        
+        disk.info[id].b->disk = 0;   // disk is done with buf
+
+        disk.used_idx = (disk.used_idx + 1) % NUM;
+    }
+}
