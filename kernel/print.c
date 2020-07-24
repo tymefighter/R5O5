@@ -4,6 +4,8 @@
 
 // formatted console output -- printf, error.
 
+// Print integer in absolute valued 
+// xx in specified base with specified sign 
 static void printint(uint64 xx, int base, int sign) {
     char buf[16];
     int i;
@@ -26,6 +28,8 @@ static void printint(uint64 xx, int base, int sign) {
         consputc(buf[i]);
 }
 
+// Treat x as a pointer to some address
+// and print the value in x as a pointer
 static void printptr(uint64 x) {
     int i;
     consputc('0');
@@ -34,7 +38,7 @@ static void printptr(uint64 x) {
         consputc(digits[x >> (sizeof(uint64) * 8 - 4)]);
 }
 
-// Print to the console. only understands %d, %x, %p, %s.
+// Print to the console. only understands %d, %x, %p, %s, %l
 void printf(char *fmt, ...) {
     va_list ap;
     int i, c;
@@ -87,6 +91,10 @@ void printf(char *fmt, ...) {
     }
 }
 
+// Function which can be called when an error or something
+// unexpected occurs in the kernel source code, it first
+// prints the string provded to it, then stops the execution
+// by going into an infinite loop
 void error(char *s) {
     printf("error: ");
     printf(s);
