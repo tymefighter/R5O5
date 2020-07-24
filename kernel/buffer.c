@@ -72,3 +72,25 @@ void brelse(Buffer *b) {
         bcache.head.next = b;
     }
 }
+
+// Read `nBytes` bytes from disk block `diskBlockNum` at offset `offset`
+// to the memory location specified by `memoryLocation`
+void readBytes(
+    int diskBlockNum,
+    int offset,
+    int nBytes,
+    char *memoryLocation
+) {
+
+}
+
+// Write `nBytes` bytes to disk block `diskBlockNum` at offset `offset`
+// from the memory location specified by `memoryLocation`
+void writeBytes(
+    int diskBlockNum,
+    int offset,
+    int nBytes,
+    char *memoryLocation
+) {
+    
+}
