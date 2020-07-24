@@ -8,7 +8,7 @@ OBJS = \
   $K/uart.o \
   $K/string.o \
   $K/main.o \
-  $K/trap.o \
+  $K/interruptHandler.o \
   $K/buffer.o \
   $K/kernelvec.o \
   $K/plic.o \

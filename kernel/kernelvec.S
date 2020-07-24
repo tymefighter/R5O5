@@ -1,17 +1,17 @@
 # Interrupts in while in machine mode come here
 # this code => push all registers, call kerneltrap(), restore, return.
-.globl kernelTrap
+.globl kernelInterruptHandler
 .globl kernelvec
 .globl ksa
 .align 4
 kernelvec:
  
-        addi sp, sp, -8         # make room in the stack to save t0 value
+        addi sp, sp, -8                 # make room in the stack to save t0 value
         sd t0, 0(sp)
         la t0, ksa
               
-        sd ra, 0(t0)            # save the registers.
-                                # don't save sp now
+        sd ra, 0(t0)                    # save the registers.
+                                        # don't save sp now
         sd gp, 16(t0)
         sd tp, 24(t0)
 
@@ -42,16 +42,16 @@ kernelvec:
         sd t5, 232(t0)
         sd t6, 240(t0)
 
-        ld t1, 0(sp)            # get value of t0
-        addi sp, sp, 8          # clear stack space
-        sd sp, 8(t0)            # save sp now
-        sd t1, 32(t0)           # store value of t0 into the save area
+        ld t1, 0(sp)                    # get value of t0
+        addi sp, sp, 8                  # clear stack space
+        sd sp, 8(t0)                    # save sp now
+        sd t1, 32(t0)                   # store value of t0 into the save area
 	                        
-        call kernelTrap               # call the C trap handler in trap.c
+        call kernelInterruptHandler     # call the C trap handler in trap.c
 
-        la t0, ksa              # load address of kernel save area into t0
+        la t0, ksa                      # load address of kernel save area into t0
                                 
-        ld ra, 0(t0)            # restore registers.
+        ld ra, 0(t0)                    # restore registers.
         ld sp, 8(t0)
         ld gp, 16(t0)
         ld tp, 24(t0)

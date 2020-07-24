@@ -18,22 +18,11 @@ void            printf(char*, ...);
 void            panic(char*) __attribute__((noreturn));
 void            printfinit(void);
 
-// main.c
-int             cpuid(void);
-
 // string.c
-int             memcmp(const void*, const void*, uint);
-void*           memmove(void*, const void*, uint);
 void*           memset(void*, int, uint);
-char*           safestrcpy(char*, const char*, int);
-int             strlen(const char*);
-int             strncmp(const char*, const char*, uint);
-char*           strncpy(char*, const char*, int);
 
-// trap.c
-extern uint     ticks;
-void            trapinit(void);
-void            trapinithart(void);
+// interruptHandler.c
+void            kernelInterruptInit(void);
 
 // uart.c
 void            uartinit(void);
@@ -48,7 +37,7 @@ uint64          plic_pending(void);
 int             plic_claim(void);
 void            plic_complete(int);
 
-// virtio_disk.c
+// disk.c
 void            virtio_disk_init(void);
 void            virtio_disk_rw(struct buf *, int);
 void            virtio_disk_intr();

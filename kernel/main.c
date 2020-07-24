@@ -5,10 +5,7 @@ void main() {
     w_satp(0);
 
     consoleinit();
-    printf("\n");
-    printf("xv6 kernel is booting\n");
-    printf("\n");
-    trapinithart();                 // install kernel trap vector
+    kernelInterruptInit();          // install kernel trap vector
     plicinit();                     // set up interrupt controller
     plicinithart();                 // ask PLIC for device interrupts
     binit();                        // buffer cache

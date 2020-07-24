@@ -2,8 +2,7 @@
 #include "functions.h"
 
 // set up to take exceptions and traps while in the kernel.
-void
-trapinithart(void) {
+void kernelInterruptInit(void) {
     intr_all_off();
     w_mtvec((uint64)kernelvec); // must be 4-byte aligned to fit in mtvec.
 }
@@ -20,10 +19,7 @@ void devintr() {
     plic_complete(irq);
 }
 
-// interrupts and exceptions from kernel code go here via kernelvec,
-// on whatever the current kernel stack is.
-// must be 4-byte aligned to fit in stvec.
-void kernelTrap() {
+void kernelInterruptHandler() {
     uint64 mcause = r_mcause();
     if(mcause & (1ull << 63ull)) {
         if((mcause & ((1ull << 63ull) - 1)) != 11)
@@ -33,8 +29,4 @@ void kernelTrap() {
     }
     else
         panic("trap: Exception Occurred");
-}
-
-void userTrap() {
-
 }
