@@ -6,5 +6,5 @@ kernel/kernel
 mkfs/r5o5_mkfs
 *.log
 getLogInfo
-information/*
+information/prog_info
 fs.img
