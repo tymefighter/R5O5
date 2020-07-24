@@ -4,16 +4,16 @@ U=user
 OBJS = \
   $K/entry.o \
   $K/console.o \
-  $K/printf.o \
+  $K/print.o \
   $K/uart.o \
   $K/string.o \
   $K/main.o \
   $K/trap.o \
-  $K/bio.o \
+  $K/buffer.o \
   $K/kernelvec.o \
   $K/plic.o \
   $K/disk.o \
-  $K/debug_test.o \
+  $K/debug.o \
   $K/globalData.o
 
 ifndef TOOLPREFIX

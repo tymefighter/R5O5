@@ -1,6 +1,6 @@
 #include "declarations.h"
 
-// bio.c
+// buffer.c
 void            binit(void);
 struct buf*     bread(uint, uint);
 void            brelse(struct buf*);
@@ -13,7 +13,7 @@ void            consoleinit(void);
 void            consoleintr(int);
 void            consputc(int);
 
-// printf.c
+// print.c
 void            printf(char*, ...);
 void            panic(char*) __attribute__((noreturn));
 void            printfinit(void);
@@ -53,7 +53,7 @@ void            virtio_disk_init(void);
 void            virtio_disk_rw(struct buf *, int);
 void            virtio_disk_intr();
 
-// debug_test.c
+// debug.c
 void            log_data_init(void);
 void            log_data(char *prt_str);
 
