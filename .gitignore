@@ -4,3 +4,4 @@ mkfs/r5o5_mkfs
 *.log
 getLogInfo
 information/*
+fs.img

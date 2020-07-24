@@ -86,8 +86,8 @@ fs.img: mkfs/r5o5_mkfs $(UPROGS)
 
 -include kernel/*.d user/*.d
 
-get_log: getLogInfo.c
-	@gcc -o getLogInfo getLogInfo.c
+log: logs/getLogInfo.c
+	@gcc -o getLogInfo logs/getLogInfo.c
 	@./getLogInfo
 
 clean: 

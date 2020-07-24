@@ -13,7 +13,7 @@ int main()
         return 0;
     }
 
-    fp_write = fopen("information/r5o5.log", "w");
+    fp_write = fopen("logs/r5o5.log", "w");
     if(!fp_write)
     {
         printf("\033[0;31mError in creating/opening log file\033[0m\n");
