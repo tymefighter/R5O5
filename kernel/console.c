@@ -11,7 +11,7 @@
 //   control-d -- end of file
 //   control-p -- print process list
 
-// send one character to the uart.
+// Sends one character to UART
 void consputc(int c) {
     extern volatile int errorOccurred;
 
@@ -20,22 +20,19 @@ void consputc(int c) {
           ;
     }
 
-    if(c == BACKSPACE){
-        // if the user typed backspace, overwrite with a space.
-        uartputc('\b'); uartputc(' '); uartputc('\b');
+    if(c == BACKSPACE) {
+        uartputc('\b');
+        uartputc(' ');
+        uartputc('\b');
     }
-    else {
+    else
         uartputc(c);
-    }
 }
 
-// the console input interrupt handler.
-// uartintr() calls this for input character.
-// do erase/kill processing, append to cons.buf,
-// wake up consoleread() if a whole line has arrived.
+// Console Input Interrupt Handler
 void consoleintr(int c) {
     switch(c){
-    case C('U'):  // Kill line.
+    case C('U'):
         while(cons.e != cons.w &&
               cons.buf[(cons.e-1) % INPUT_BUF] != '\n'){
           cons.e--;
@@ -43,7 +40,7 @@ void consoleintr(int c) {
         }
         break;
         
-    case C('H'): // Backspace
+    case C('H'):
     case '\x7f':
         if(cons.e != cons.w){
             cons.e--;
@@ -55,23 +52,18 @@ void consoleintr(int c) {
       if(c != 0 && cons.e-cons.r < INPUT_BUF){
             c = (c == '\r') ? '\n' : c;
 
-            // echo back to the user.
             consputc(c);
-
-            // store for consumption by consoleread().
             cons.buf[cons.e++ % INPUT_BUF] = c;
 
-            if(c == '\n' || c == C('D') || cons.e == cons.r+INPUT_BUF){
-                // wake up consoleread() if a whole line (or end-of-file)
-                // has arrived.
+            if(c == '\n' || c == C('D') || cons.e == cons.r+INPUT_BUF)
                 cons.w = cons.e;
-            }
         }
 
         break;
     }
 }
 
+// Initialize Console
 void consoleinit(void) {
     uartinit();
 }

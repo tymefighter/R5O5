@@ -137,9 +137,9 @@ extern char digits[];
 
 // Kernal SaveArea
 typedef struct kernelSaveArea {
-uint64 reg[NREG];           // Register Save Area
-uint64 epc;                 // Exception Program Counter
-uint64 sstatus_value;       // Value of sstatus register
+    uint64 reg[NREG];           // Register Save Area
+    uint64 epc;                 // Exception Program Counter
+    uint64 sstatus_value;       // Value of sstatus register
 } kernelSaveArea;
 
 // User Save Area

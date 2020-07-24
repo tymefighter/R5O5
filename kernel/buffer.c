@@ -1,6 +1,7 @@
 #include "declarations.h"
 #include "functions.h"
 
+// Initialize Buffer Cache
 void binit(void) {
     Buffer *b;
 
@@ -14,6 +15,7 @@ void binit(void) {
     }
 }
 
+// Get a free Buffer
 static Buffer *bget(uint blockno) {
     Buffer *b;
 
@@ -36,7 +38,9 @@ static Buffer *bget(uint blockno) {
     error("bget: no buffers");
 }
 
-struct Buffer *bread(uint blockno) {
+// Read a disk block specified by blockno into the buffer and return
+// the address of that buffer
+Buffer *bread(uint blockno) {
     Buffer *b = bget(blockno);
 
     if(!b->valid) {
@@ -47,10 +51,12 @@ struct Buffer *bread(uint blockno) {
     return b;
 }
 
+// Write the buffer back to the block to which it corresponds to
 void bwrite(Buffer *b) {
     diskRW(b, 1);
 }
 
+// Release the buffer - return the buffer back to the buffer free list
 void brelse(Buffer *b) {
     b->refcnt--;
     if (b->refcnt == 0) {
@@ -61,12 +67,4 @@ void brelse(Buffer *b) {
         bcache.head.next->prev = b;
         bcache.head.next = b;
     }
-}
-
-void bpin(Buffer *b) {
-    b->refcnt++;
-}
-
-void bunpin(Buffer *b) {
-    b->refcnt--;
 }

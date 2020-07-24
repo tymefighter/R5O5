@@ -1,20 +1,23 @@
 #include "declarations.h"
 #include "functions.h"
 
+// Main - Here is where the control passes
+// from entry.S
 void main() {
-    w_satp(0);
+    w_satp(0);                      // Disable Paging
 
-    consoleinit();
-    kernelInterruptInit();          // install kernel trap vector
-    plicinit();                     // set up interrupt controller
-    plicinithart();                 // ask PLIC for device interrupts
-    binit();                        // buffer cache
-    diskInit();                     // emulated hard disk
-    logDataInit();
+    consoleinit();                  // Set up Console
+    kernelInterruptInit();          // Set up Kernel Interrupt Handler
+    plicinit();                     // Set up Interrupt Controller
+    plicinithart();                 // Set up PLIC to perform device interrupts
+    binit();                        // Set up Buffer Cache
+    diskInit();                     // Set up the Disk Driver
+    logDataInit();                  // Set up Information Logging Mechanism
+
     logData("This data would be placed into the disk \
     \nfrom the starting of the log blocks\n");
-
     printf("done !\n");
+
     while(1)
         ; 
 }

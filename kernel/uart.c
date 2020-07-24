@@ -1,10 +1,9 @@
-//
-// low-level driver routines for 16550a UART.
-//
-
 #include "declarations.h"
 #include "functions.h"
 
+// Low-Level Driver Routines for 16550a UART
+
+// Initialize UART
 void uartinit(void) {
     // disable interrupts.
     WriteRegUART(IER, 0x00);
@@ -29,7 +28,7 @@ void uartinit(void) {
     WriteRegUART(IER, 0x01);
 }
 
-// write one output character to the UART.
+// Write one output character to the UART
 void uartputc(int c) {
     // wait for Transmit Holding Empty to be set in LSR.
     while((ReadRegUART(LSR) & (1 << 5)) == 0)
@@ -37,8 +36,8 @@ void uartputc(int c) {
     WriteRegUART(THR, c);
 }
 
-// read one input character from the UART.
-// return -1 if none is waiting.
+// Read one input character from the UART
+// Return -1 if none is waiting
 int uartgetc(void) {
     if(ReadRegUART(LSR) & 0x01){
         // input data is ready.
@@ -49,7 +48,7 @@ int uartgetc(void) {
     }
 }
 
-// trap.c calls here when the uart interrupts.
+// `devintr` calls here when the uart interrupts
 void uartintr(void) {
     while(1){
         int c = uartgetc();

@@ -1,6 +1,9 @@
 #include "declarations.h"
 #include "functions.h"
 
+// Disk Device Driver Source Code
+
+// Initialize Disk
 void diskInit(void) {
     uint32 status = 0;
 
@@ -98,6 +101,9 @@ static int alloc3_desc(int *idx) {
     return 0;
 }
 
+// Reads a block from disk to buffer if write = 0
+// Writes the buffer content to its corresponding
+// block if write != 0
 void diskRW(Buffer *b, int write) {
     uint64 sector = b->blockno * (BSIZE / 512);
 
@@ -128,10 +134,12 @@ void diskRW(Buffer *b, int write) {
 
     disk.desc[idx[1]].addr = (uint64) b->data;
     disk.desc[idx[1]].len = BSIZE;
+
     if(write)
         disk.desc[idx[1]].flags = 0;
     else
         disk.desc[idx[1]].flags = VRING_DESC_F_WRITE;
+
     disk.desc[idx[1]].flags |= VRING_DESC_F_NEXT;
     disk.desc[idx[1]].next = idx[2];
 
@@ -157,6 +165,7 @@ void diskRW(Buffer *b, int write) {
     free_chain(idx[0]);
 }
 
+// Disk Interrupt Handler
 void diskIntr() {
     while((disk.used_idx % NUM) != (disk.used->id % NUM)) {
         int id = disk.used->elems[disk.used_idx].id;

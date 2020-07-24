@@ -1,14 +1,16 @@
 #include "declarations.h"
 #include "functions.h"
 
-// int block_no, off; // current unused log block, offset this current block
-// uint64 temp_reg_state[NREG];
-
+// Initialize Information Logging Mechanism
 void logDataInit() {
     block_no = LOGSTART;
     off = 0;
 }
 
+// Write the string prt_str in the log area
+// Successive writes would append the string
+// to the strings written in the previous
+// writes 
 void logData(char *prt_str) {
     Buffer *buff = bread(block_no);
 
