@@ -14,9 +14,6 @@ OBJS = \
   $K/plic.o \
   $K/disk.o \
   $K/debug_test.o \
-  $K/dump_reg_state.o \
-  $K/proc.o \
-  $K/uservec.o \
   $K/globalData.o
 
 ifndef TOOLPREFIX

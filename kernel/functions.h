@@ -13,11 +13,6 @@ void            consoleinit(void);
 void            consoleintr(int);
 void            consputc(int);
 
-// kalloc.c
-void*           kalloc(void);
-void            kfree(void *);
-void            kinit();
-
 // printf.c
 void            printf(char*, ...);
 void            panic(char*) __attribute__((noreturn));
@@ -46,25 +41,6 @@ void            uartintr(void);
 void            uartputc(int);
 int             uartgetc(void);
 
-// vm.c
-void            kvminit(void);
-void            kvminithart(void);
-uint64          kvmpa(uint64);
-void            kvmmap(uint64, uint64, uint64, int);
-int             mappages(pagetable_t, uint64, uint64, uint64, int);
-pagetable_t     uvmcreate(void);
-void            uvminit(pagetable_t, uchar *, uint);
-uint64          uvmalloc(pagetable_t, uint64, uint64);
-uint64          uvmdealloc(pagetable_t, uint64, uint64);
-int             uvmcopy(pagetable_t, pagetable_t, uint64);
-void            uvmfree(pagetable_t, uint64);
-void            uvmunmap(pagetable_t, uint64, uint64, int);
-void            uvmclear(pagetable_t, uint64);
-uint64          walkaddr(pagetable_t, uint64);
-int             copyout(pagetable_t, uint64, char *, uint64);
-int             copyin(pagetable_t, char *, uint64, uint64);
-int             copyinstr(pagetable_t, char *, uint64, uint64);
-
 // plic.c
 void            plicinit(void);
 void            plicinithart(void);
@@ -80,15 +56,6 @@ void            virtio_disk_intr();
 // debug_test.c
 void            log_data_init(void);
 void            log_data(char *prt_str);
-
-// proc.c
-void            timerInterruptHandler(void);
-
-// dump_reg_state.S
-void            dump_reg_state(void);
-
-// uservec.S
-void            uservec(void);
 
 // kernelvec.S
 void            kernelvec(void);
