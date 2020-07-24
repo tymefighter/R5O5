@@ -10,7 +10,7 @@ void logDataInit() {
 }
 
 void logData(char *prt_str) {
-    Buffer *buff = bread(-1, block_no);
+    Buffer *buff = bread(block_no);
 
     while((*prt_str) != '\0') {
         if(off == BSIZE) {
@@ -21,7 +21,7 @@ void logData(char *prt_str) {
             if(block_no == FSSIZE)
                 panic("logData");
 
-            buff = bread(-1, block_no);
+            buff = bread(block_no);
         }
         buff->data[off] = *prt_str;
         prt_str ++;

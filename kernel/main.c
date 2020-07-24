@@ -9,7 +9,7 @@ void main() {
     plicinit();                     // set up interrupt controller
     plicinithart();                 // ask PLIC for device interrupts
     binit();                        // buffer cache
-    virtio_disk_init();             // emulated hard disk
+    diskInit();                     // emulated hard disk
     logDataInit();
     logData("This data would be placed into the disk \
     \nfrom the starting of the log blocks\n");

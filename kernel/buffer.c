@@ -35,12 +35,12 @@ void binit(void) {
 // Look through buffer cache for block on device dev.
 // If not found, allocate a buffer.
 // In either case, return locked buffer.
-static Buffer *bget(uint dev, uint blockno) {
+static Buffer *bget(uint blockno) {
     Buffer *b;
 
     // Is the block already cached?
     for(b = bcache.head.next; b != &bcache.head; b = b->next){
-        if(b->dev == dev && b->blockno == blockno){
+        if(b->blockno == blockno){
             b->refcnt++;
             return b;
         }
@@ -49,7 +49,6 @@ static Buffer *bget(uint dev, uint blockno) {
     // Not cached; recycle an unused buffer.
     for(b = bcache.head.prev; b != &bcache.head; b = b->prev){
         if(b->refcnt == 0) {
-            b->dev = dev;
             b->blockno = blockno;
             b->valid = 0;
             b->refcnt = 1;
@@ -60,12 +59,12 @@ static Buffer *bget(uint dev, uint blockno) {
 }
 
 // Return a locked buf with the contents of the indicated block.
-struct Buffer *bread(uint dev, uint blockno) {
+struct Buffer *bread(uint blockno) {
     Buffer *b;
 
-    b = bget(dev, blockno);
+    b = bget(blockno);
     if(!b->valid) {
-        virtio_disk_rw(b, 0);
+        diskRW(b, 0);
         b->valid = 1;
     }
     return b;
@@ -73,7 +72,7 @@ struct Buffer *bread(uint dev, uint blockno) {
 
 // Write b's contents to disk.    Must be locked.
 void bwrite(Buffer *b) {
-    virtio_disk_rw(b, 1);
+    diskRW(b, 1);
 }
 
 // Release a locked buffer.

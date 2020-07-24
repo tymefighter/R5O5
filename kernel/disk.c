@@ -9,7 +9,7 @@
 #include "declarations.h"
 #include "functions.h"
 
-void virtio_disk_init(void) {
+void diskInit(void) {
     uint32 status = 0;
 
 
@@ -116,7 +116,7 @@ static int alloc3_desc(int *idx) {
     return 0;
 }
 
-void virtio_disk_rw(Buffer *b, int write) {
+void diskRW(Buffer *b, int write) {
     uint64 sector = b->blockno * (BSIZE / 512);
 
 
@@ -194,8 +194,7 @@ void virtio_disk_rw(Buffer *b, int write) {
     free_chain(idx[0]);
 }
 
-void
-virtio_disk_intr() {
+void diskIntr() {
     while((disk.used_idx % NUM) != (disk.used->id % NUM)) {
         int id = disk.used->elems[disk.used_idx].id;
 

@@ -2,7 +2,7 @@
 
 // buffer.c
 void            binit(void);
-Buffer *        bread(uint, uint);
+Buffer *        bread(uint);
 void            brelse(Buffer *);
 void            bwrite(Buffer *);
 void            bpin(Buffer *);
@@ -38,9 +38,9 @@ int             plic_claim(void);
 void            plic_complete(int);
 
 // disk.c
-void            virtio_disk_init(void);
-void            virtio_disk_rw(Buffer *, int);
-void            virtio_disk_intr();
+void            diskInit(void);
+void            diskRW(Buffer *, int);
+void            diskIntr();
 
 // debug.c
 void            logDataInit(void);

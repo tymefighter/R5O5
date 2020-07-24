@@ -91,7 +91,6 @@ extern char SystemStack[4096 * NCPU];
 typedef struct Buffer {
     int valid;          // has data been read from disk?
     int disk;           // does disk "own" buf?
-    uint dev;
     uint blockno;
     uint refcnt;
     struct Buffer *prev;   // LRU cache list
