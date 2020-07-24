@@ -18,7 +18,7 @@
 #include "functions.h"
 
 void binit(void) {
-    struct buf *b;
+    Buffer *b;
 
 
     // Create linked list of buffers
@@ -35,8 +35,8 @@ void binit(void) {
 // Look through buffer cache for block on device dev.
 // If not found, allocate a buffer.
 // In either case, return locked buffer.
-static struct buf* bget(uint dev, uint blockno) {
-    struct buf *b;
+static Buffer *bget(uint dev, uint blockno) {
+    Buffer *b;
 
     // Is the block already cached?
     for(b = bcache.head.next; b != &bcache.head; b = b->next){
@@ -60,8 +60,8 @@ static struct buf* bget(uint dev, uint blockno) {
 }
 
 // Return a locked buf with the contents of the indicated block.
-struct buf* bread(uint dev, uint blockno) {
-    struct buf *b;
+struct Buffer *bread(uint dev, uint blockno) {
+    Buffer *b;
 
     b = bget(dev, blockno);
     if(!b->valid) {
@@ -72,15 +72,13 @@ struct buf* bread(uint dev, uint blockno) {
 }
 
 // Write b's contents to disk.    Must be locked.
-void
-bwrite(struct buf *b)
-{
+void bwrite(Buffer *b) {
     virtio_disk_rw(b, 1);
 }
 
 // Release a locked buffer.
 // Move to the head of the MRU list.
-void brelse(struct buf *b) {
+void brelse(Buffer *b) {
 
     b->refcnt--;
     if (b->refcnt == 0) {
@@ -95,10 +93,10 @@ void brelse(struct buf *b) {
 
 }
 
-void bpin(struct buf *b) {
+void bpin(Buffer *b) {
     b->refcnt++;
 }
 
-void bunpin(struct buf *b) {
+void bunpin(Buffer *b) {
     b->refcnt--;
 }

@@ -88,24 +88,24 @@ extern char SystemStack[4096 * NCPU];
 // ----------------------------------------------------------------------------
 
 // Single Buffer of Buffer Cache
-typedef struct buf {
+typedef struct Buffer {
     int valid;          // has data been read from disk?
     int disk;           // does disk "own" buf?
     uint dev;
     uint blockno;
     uint refcnt;
-    struct buf *prev;   // LRU cache list
-    struct buf *next;
-    struct buf *qnext;
+    struct Buffer *prev;   // LRU cache list
+    struct Buffer *next;
+    struct Buffer *qnext;
     uchar data[BSIZE];
-} buf;
+} Buffer;
 
 // Buffer Cache
 typedef struct BufferCache {
-    buf buf[NBUF];
+    Buffer buf[NBUF];
     // Linked list of all buffers, through prev/next.
     // head.next is most recently used.
-    buf head;
+    Buffer head;
 } BufferCache;
 
 extern BufferCache bcache;
@@ -351,7 +351,7 @@ typedef struct Disk {
     // for use when completion interrupt arrives.
     // indexed by first descriptor index of chain.
     struct {
-        buf *b;
+        Buffer *b;
         char status;
     } info[NUM];
 

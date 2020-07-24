@@ -10,8 +10,8 @@ void main() {
     plicinithart();                 // ask PLIC for device interrupts
     binit();                        // buffer cache
     virtio_disk_init();             // emulated hard disk
-    log_data_init();
-    log_data("This data would be placed into the disk \
+    logDataInit();
+    logData("This data would be placed into the disk \
     \nfrom the starting of the log blocks\n");
 
     printf("done !\n");

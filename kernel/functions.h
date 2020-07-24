@@ -2,11 +2,11 @@
 
 // buffer.c
 void            binit(void);
-struct buf*     bread(uint, uint);
-void            brelse(struct buf*);
-void            bwrite(struct buf*);
-void            bpin(struct buf*);
-void            bunpin(struct buf*);
+Buffer *        bread(uint, uint);
+void            brelse(Buffer *);
+void            bwrite(Buffer *);
+void            bpin(Buffer *);
+void            bunpin(Buffer *);
 
 // console.c
 void            consoleinit(void);
@@ -39,12 +39,12 @@ void            plic_complete(int);
 
 // disk.c
 void            virtio_disk_init(void);
-void            virtio_disk_rw(struct buf *, int);
+void            virtio_disk_rw(Buffer *, int);
 void            virtio_disk_intr();
 
 // debug.c
-void            log_data_init(void);
-void            log_data(char *prt_str);
+void            logDataInit(void);
+void            logData(char *prt_str);
 
 // kernelvec.S
 void            kernelvec(void);
