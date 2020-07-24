@@ -4,20 +4,16 @@
 // int block_no, off; // current unused log block, offset this current block
 // uint64 temp_reg_state[NREG];
 
-void log_data_init()
-{
+void log_data_init() {
     block_no = LOGSTART;
     off = 0;
 }
 
-void log_data(char *prt_str)
-{
+void log_data(char *prt_str) {
     struct buf *buff = bread(-1, block_no);
 
-    while((*prt_str) != '\0')
-    {
-        if(off == BSIZE)
-        {
+    while((*prt_str) != '\0') {
+        if(off == BSIZE) {
             bwrite(buff);
             brelse(buff);
             block_no ++;
@@ -36,8 +32,7 @@ void log_data(char *prt_str)
 }
 
 // This is called by dump_reg_state function
-void printTempRegState()
-{
+void printTempRegState() {
     // Just print the registers here
     printf("The register content is: \n");
     printf("ra %l\n",temp_reg_state[0]);

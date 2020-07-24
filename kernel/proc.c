@@ -6,14 +6,12 @@
 extern void ret_to_user(void);                      // Returns to user modec
 extern void uservec(void);                          // Uservec in uservec.S
 
-void proc_init()
-{
+void proc_init() {
     for(int i = 0;i < NumberOfProcesses;i++)
         pd[i].slotAllocated = 0;
 }
 
-int SelectProcessToRun()
-{
+int SelectProcessToRun() {
     static int next_proc = NumberOfProcesses;
     
     if(current_process > 0
@@ -21,15 +19,13 @@ int SelectProcessToRun()
         && pd[current_process].timeLeft > 0)
         return current_process;
     
-    for(int i = 0;i < NumberOfProcesses;i++)
-    {
+    for(int i = 0;i < NumberOfProcesses;i++) {
         next_proc ++;
         if(next_proc >= NumberOfProcesses)
             next_proc = 0;
         
         if(pd[next_proc].slotAllocated
-            && (pd[next_proc].state == Created || pd[next_proc].state == Ready))
-        {
+            && (pd[next_proc].state == Created || pd[next_proc].state == Ready)) {
             pd[next_proc].state = Running;
             pd[next_proc].timeLeft = TimeQuantum;
             return next_proc;
@@ -39,10 +35,8 @@ int SelectProcessToRun()
     return -1;
 }
 
-void RunProcess()
-{
-    if(current_process < 0)
-    {
+void RunProcess() {
+    if(current_process < 0) {
         panic("RunProcess");                        // for now we panic !
         intr_all_on();
         asm volatile ("wfi");
@@ -59,14 +53,12 @@ void RunProcess()
     ret_to_user();
 }
 
-void dispatcher(void)
-{
+void dispatcher(void) {
     current_process = SelectProcessToRun();
     RunProcess();
 }
 
-void timerInterruptHandler(void)
-{
+void timerInterruptHandler(void) {
     if((r_mstatus() & (3 << 11)) != 0)              // if timer interrupt came in any other mode than user mode, then panic
         panic("timerInterruptHandler");
 
@@ -75,27 +67,3 @@ void timerInterruptHandler(void)
 
     dispatcher();
 }
-
-void read_elf(int pid, int start_blk, int start_off, int end_block, int end_off)
-{
-
-}
-
-// int createProcessSysProc(int start_blk, int start_off, int end_block, int end_off)
-// {
-//     int pid;
-//     for(pid = 0;pid < NumberOfProcesses;pid++)
-//     {
-//         if(!pd[pid].slotAllocated)
-//             break;
-//     }
-
-//     if(pid == NumberOfProcesses)
-//         return -1;
-
-//     pd[pid].slotAllocated = 1;
-//     pd[pid].state = Ready;
-//     pd[pid].sa.pt = uvmcreate();
-
-
-// }

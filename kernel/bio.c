@@ -17,9 +17,7 @@
 #include "declarations.h"
 #include "functions.h"
 
-void
-binit(void)
-{
+void binit(void) {
     struct buf *b;
 
 
@@ -37,9 +35,7 @@ binit(void)
 // Look through buffer cache for block on device dev.
 // If not found, allocate a buffer.
 // In either case, return locked buffer.
-static struct buf*
-bget(uint dev, uint blockno)
-{
+static struct buf* bget(uint dev, uint blockno) {
     struct buf *b;
 
     // Is the block already cached?
@@ -64,9 +60,7 @@ bget(uint dev, uint blockno)
 }
 
 // Return a locked buf with the contents of the indicated block.
-struct buf*
-bread(uint dev, uint blockno)
-{
+struct buf* bread(uint dev, uint blockno) {
     struct buf *b;
 
     b = bget(dev, blockno);
@@ -86,9 +80,7 @@ bwrite(struct buf *b)
 
 // Release a locked buffer.
 // Move to the head of the MRU list.
-void
-brelse(struct buf *b)
-{
+void brelse(struct buf *b) {
 
     b->refcnt--;
     if (b->refcnt == 0) {
@@ -103,17 +95,10 @@ brelse(struct buf *b)
 
 }
 
-void
-bpin(struct buf *b) {
+void bpin(struct buf *b) {
     b->refcnt++;
 }
 
-void
-bunpin(struct buf *b) {
+void bunpin(struct buf *b) {
     b->refcnt--;
 }
-
-// char read_disk(uint64 disk_addr, char *mem_addr, int n_bytes)
-// {
-    
-// }

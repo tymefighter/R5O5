@@ -1,9 +1,7 @@
 #include "declarations.h"
 #include "functions.h"
 
-void
-main()
-{
+void main() {
     w_satp(0);
 
     consoleinit();
@@ -16,8 +14,10 @@ main()
     binit();                        // buffer cache
     virtio_disk_init();             // emulated hard disk
     log_data_init();
-    log_data("This data would be placed into the disk\nfrom the starting of the log blocks\n");
+    log_data("This data would be placed into the disk \
+    \nfrom the starting of the log blocks\n");
 
     printf("done !\n");
-    while(1); 
+    while(1)
+        ; 
 }

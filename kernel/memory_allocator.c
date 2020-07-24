@@ -1,13 +1,11 @@
 #include "declarations.h"
 #include "functions.h"
 
-void init_free_page()
-{
+void init_free_page() {
     fp_list.start = NULL;
     fp_list.num_free_pages = 0;
 
-    for(uint64 addr = PROCESS_START;addr <= PROCESS_END;addr += PGSIZE)
-    {
+    for(uint64 addr = PROCESS_START;addr <= PROCESS_END;addr += PGSIZE) {
         FreePage *free_page = (FreePage *)addr;
         
         free_page->addr_start = addr;
@@ -19,8 +17,7 @@ void init_free_page()
 }
 
 // Takes start of free page address as input
-void free_page(char *addr)
-{
+void free_page(char *addr) {
     FreePage *new_free_page = (FreePage *)addr;
 
     new_free_page->addr_start = addr;
@@ -30,8 +27,7 @@ void free_page(char *addr)
     fp_list.num_free_pages ++;
 }
 
-char *get_free_page()
-{
+char *get_free_page() {
     if(fp_list.num_free_pages == 0)
         return NULL;
 
