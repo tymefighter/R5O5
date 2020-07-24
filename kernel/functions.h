@@ -7,6 +7,8 @@ void            brelse(Buffer *);
 void            bwrite(Buffer *);
 void            bpin(Buffer *);
 void            bunpin(Buffer *);
+void            readBytes(int, int, int, uchar *);
+void            writeBytes(int, int, int, uchar *);
 
 // console.c
 void            consoleinit(void);
