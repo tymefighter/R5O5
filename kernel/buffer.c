@@ -1,6 +1,10 @@
 #include "declarations.h"
 #include "functions.h"
 
+// This file contains functions which would be used
+// to load disk blocks into buffers and store buffers
+// into disk blocks
+
 // Initialize Buffer Cache
 void binit(void) {
     Buffer *b;

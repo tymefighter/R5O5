@@ -20,7 +20,7 @@ void logData(char *prt_str) {
             brelse(buff);
             block_no ++;
             off = 0;
-            if(block_no == FSSIZE)
+            if(block_no == DISKSIZE)
                 error("logData");
 
             buff = bread(block_no);

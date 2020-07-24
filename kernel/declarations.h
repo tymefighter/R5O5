@@ -23,22 +23,22 @@ typedef uint64 pde_t;
 #define BSIZE       1024                // Disk Block Size
 #define PGSIZE      4096                // Bytes per Page
 #define PGSHIFT     12                  // Bits of Offset within a Page
-#define FSSIZE    1000                // size of disk in blocks
+#define DISKSIZE    1000                // size of disk in blocks
 #define CPUID       0
 #define MAXOPBLOCKS 10                  // max # of blocks any op writes
 
-// Machine Status Register, mstatus
-#define MSTATUS_MPP_MASK (3L << 11)     // previous mode.
-#define MSTATUS_MPP_M (3L << 11)
-#define MSTATUS_MPP_S (1L << 11)
-#define MSTATUS_MPP_U (0L << 11)
-#define MSTATUS_MIE (1L << 3)           // machine-mode interrupt enable.
-#define MSTATUS_MPIE (1L << 7)
+// Bits in Machine Status Register, mstatus
+#define MSTATUS_MPP_MASK (3L << 11) // previous mode.
+#define MSTATUS_MPP_M (3L << 11)    // machine-mode previous privilege is machine
+#define MSTATUS_MPP_S (1L << 11)    // machine-mode previous privilege is superv
+#define MSTATUS_MPP_U (0L << 11)    // machine-mode previous privilege is user
+#define MSTATUS_MIE (1L << 3)       // machine-mode interrupt enable
+#define MSTATUS_MPIE (1L << 7)      // machine-mode previous interrupt enable
 
-// Machine-mode Interrupt Enable
-#define MIE_MEIE (1L << 11)             // external
-#define MIE_MTIE (1L << 7)              // timer
-#define MIE_MSIE (1L << 3)              // software
+// Bits in Machine-mode Interrupt Enable, mie
+#define MIE_MEIE (1L << 11)             // external interrupt
+#define MIE_MTIE (1L << 7)              // timer interrupt
+#define MIE_MSIE (1L << 3)              // software interrupt
 
 #define SATP_SV39 (8L << 60)
 #define MAKE_SATP(pagetable) (SATP_SV39 | (((uint64)pagetable) >> 12))
