@@ -8,7 +8,7 @@ void diskInit(void) {
         *RVIRT(VIRTIO_MMIO_VERSION) != 1 ||
         *RVIRT(VIRTIO_MMIO_DEVICE_ID) != 2 ||
         *RVIRT(VIRTIO_MMIO_VENDOR_ID) != 0x554d4551){
-        panic("could not find virtio disk");
+        error("could not find virtio disk");
     }
   
     status |= VIRTIO_CONFIG_S_ACKNOWLEDGE;
@@ -39,13 +39,13 @@ void diskInit(void) {
     uint32 max = *RVIRT(VIRTIO_MMIO_QUEUE_NUM_MAX);
 
     if(max == 0)
-        panic("virtio disk has no queue 0");
+        error("virtio disk has no queue 0");
 
     if(max < NUM)
-        panic("virtio disk max queue too short");
+        error("virtio disk max queue too short");
 
     *RVIRT(VIRTIO_MMIO_QUEUE_NUM) = NUM;
-    
+
     memset(disk.pages, 0, sizeof(disk.pages));
     *RVIRT(VIRTIO_MMIO_QUEUE_PFN) = ((uint64)disk.pages) >> PGSHIFT;
 
@@ -69,9 +69,9 @@ static int alloc_desc() {
 
 static void free_desc(int i) {
     if(i >= NUM)
-        panic("virtio_disk_intr 1");
+        error("virtio_disk_intr 1");
     if(disk.free[i])
-        panic("virtio_disk_intr 2");
+        error("virtio_disk_intr 2");
     disk.desc[i].addr = 0;
     disk.free[i] = 1;
 }
@@ -162,7 +162,7 @@ void diskIntr() {
         int id = disk.used->elems[disk.used_idx].id;
 
         if(disk.info[id].status != 0)
-            panic("virtio_disk_intr status");
+            error("diskIntr status");
         
         disk.info[id].b->disk = 0;   // disk is done with buf
 

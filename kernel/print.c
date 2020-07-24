@@ -1,11 +1,8 @@
-//
-// formatted console output -- printf, panic.
-//
-
 #include <stdarg.h>
-
 #include "declarations.h"
 #include "functions.h"
+
+// formatted console output -- printf, error.
 
 static void printint(uint64 xx, int base, int sign) {
     char buf[16];
@@ -44,7 +41,7 @@ void printf(char *fmt, ...) {
     char *s;
 
     if (fmt == 0)
-        panic("null fmt");
+        error("null fmt");
 
     va_start(ap, fmt);
     for(i = 0; (c = fmt[i] & 0xff) != 0; i++){
@@ -90,11 +87,11 @@ void printf(char *fmt, ...) {
     }
 }
 
-void panic(char *s) {
-    printf("panic: ");
+void error(char *s) {
+    printf("error: ");
     printf(s);
     printf("\n");
-    panicked = 1; // freeze other CPUs
+    errorOccurred = 1; // freeze other CPUs
     for(;;)
         ;
 }

@@ -33,7 +33,7 @@ static Buffer *bget(uint blockno) {
         }
     }
 
-    panic("bget: no buffers");
+    error("bget: no buffers");
 }
 
 struct Buffer *bread(uint blockno) {

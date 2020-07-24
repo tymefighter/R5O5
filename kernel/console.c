@@ -1,4 +1,7 @@
-//
+#include <stdarg.h>
+#include "declarations.h"
+#include "functions.h"
+
 // Console input and output, to the uart.
 // Reads are line at a time.
 // Implements special input characters:
@@ -7,20 +10,12 @@
 //   control-u -- kill line
 //   control-d -- end of file
 //   control-p -- print process list
-//
 
-#include <stdarg.h>
-
-#include "declarations.h"
-#include "functions.h"
-
-//
 // send one character to the uart.
-//
 void consputc(int c) {
-    extern volatile int panicked; // from printf.c
+    extern volatile int errorOccurred;
 
-    if(panicked) {
+    if(errorOccurred) {
         for(;;)
           ;
     }
@@ -34,22 +29,10 @@ void consputc(int c) {
     }
 }
 
-// struct {
-//   // input
-// #define INPUT_BUF 128
-//   char buf[INPUT_BUF];
-//   uint r;  // Read index
-//   uint w;  // Write index
-//   uint e;  // Edit index
-// } cons;
-
-
-//
 // the console input interrupt handler.
 // uartintr() calls this for input character.
 // do erase/kill processing, append to cons.buf,
 // wake up consoleread() if a whole line has arrived.
-//
 void consoleintr(int c) {
     switch(c){
     case C('U'):  // Kill line.

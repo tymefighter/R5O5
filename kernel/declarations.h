@@ -129,7 +129,7 @@ extern Console cons;
 // Print
 // ----------------------------------------------------------------------------
 
-extern volatile int panicked;
+extern volatile int errorOccurred;
 extern char digits[];
 
 // Save Area

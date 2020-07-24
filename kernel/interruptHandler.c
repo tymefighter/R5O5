@@ -23,10 +23,10 @@ void kernelInterruptHandler() {
     uint64 mcause = r_mcause();
     if(mcause & (1ull << 63ull)) {
         if((mcause & ((1ull << 63ull) - 1)) != 11)
-            panic("trap: Exception other than external");
+            error("trap: Exception other than external");
         
         devintr();
     }
     else
-        panic("trap: Exception Occurred");
+        error("trap: Exception Occurred");
 }

@@ -19,7 +19,7 @@ void logData(char *prt_str) {
             block_no ++;
             off = 0;
             if(block_no == FSSIZE)
-                panic("logData");
+                error("logData");
 
             buff = bread(block_no);
         }
