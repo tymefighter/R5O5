@@ -72,3 +72,52 @@ void brelse(Buffer *b) {
         bcache.head.next = b;
     }
 }
+
+void readBytes(
+    int diskBlockNum,
+    int offset,
+    int nBytes,
+    uchar *memoryLocation
+) {
+    int nextBytePosToRead = offset;
+    int bytesRead = 0;
+    Buffer* b = bread(diskBlockNum);
+    while(bytesRead < nBytes){
+        if(nextBytePosToRead == BSIZE){
+            brelse(b);
+            diskBlockNum++;
+            b = bread(diskBlockNum);
+            nextBytePosToRead = 0;
+        }
+        *memoryLocation = (b -> data)[nextBytePosToRead];
+        nextBytePosToRead++;
+        memoryLocation = memoryLocation + 1;
+        bytesRead = bytesRead + 1;
+    }
+}
+
+// Write `nBytes` bytes to disk block `diskBlockNum` at offset `offset`
+// from the memory location specified by `memoryLocation`
+void writeBytes(
+    int diskBlockNum,
+    int offset,
+    int nBytes,
+    uchar *memoryLocation
+) {
+    int nextBytePosToWrite = offset;
+    int bytesWritten = 0;
+    Buffer* b = bwrite(diskBlockNum);
+    while(bytesWritten < nBytes){
+        if(nextBytePosToWrite == BSIZE){
+            brelse(b);
+            diskBlockNum++;
+            b = bwrite(diskBlockNum);
+            nextBytePosToWrite = 0;
+        }
+        *memoryLocation = (b -> data)[nextBytePosToWrite];
+        nextBytePosToWrite++;
+        memoryLocation = memoryLocation + 1;
+        bytesWritten = bytesWritten + 1;
+    }
+    
+}
