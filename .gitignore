@@ -1,5 +1,7 @@
 kernel/*.d
 kernel/*.o
+kernel/*.asm
+kernel/kernel.sym
 mkfs/r5o5_mkfs
 *.log
 getLogInfo
