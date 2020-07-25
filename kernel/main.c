@@ -7,6 +7,7 @@ void main() {
     w_satp(0);                      // Disable Paging
 
     consoleinit();                  // Set up Console
+    printf("\nR5O5 kernel is booting\n\n");
     kernelInterruptInit();          // Set up Kernel Interrupt Handler
     plicinit();                     // Set up Interrupt Controller
     plicinithart();                 // Set up PLIC to perform device interrupts
