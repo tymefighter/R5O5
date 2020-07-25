@@ -47,7 +47,7 @@ kernelvec:
         sd sp, 8(t0)                    # save sp now
         sd t1, 32(t0)                   # store value of t0 into the save area
 	                        
-        call kernelInterruptHandler     # call the C trap handler in trap.c
+        call kernelInterruptHandler     # call the C trap handler in interruptHandler.c
 
         la t0, ksa                      # load address of kernel save area into t0
                                 
