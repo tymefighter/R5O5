@@ -94,30 +94,28 @@ void readBytes(
         memoryLocation = memoryLocation + 1;
         bytesRead = bytesRead + 1;
     }
+    brelse(b);				// release the buffer
 }
 
 // Write `nBytes` bytes to disk block `diskBlockNum` at offset `offset`
 // from the memory location specified by `memoryLocation`
-void writeBytes(
-    int diskBlockNum,
-    int offset,
-    int nBytes,
-    uchar *memoryLocation
-) {
+void writeBytes(int diskBlockNum, int offset, int nBytes, uchar *memoryLocation) {
     int nextBytePosToWrite = offset;
     int bytesWritten = 0;
-    Buffer* b = bwrite(diskBlockNum);
+    Buffer* b = bread(diskBlockNum);
     while(bytesWritten < nBytes){
         if(nextBytePosToWrite == BSIZE){
+	  		bwrite(b);		// write changes made in the buffer to the disk block
             brelse(b);
             diskBlockNum++;
-            b = bwrite(diskBlockNum);
+            b = bread(diskBlockNum);
             nextBytePosToWrite = 0;
         }
-        *memoryLocation = (b -> data)[nextBytePosToWrite];
+        (b -> data)[nextBytePosToWrite] = *memoryLocation;
         nextBytePosToWrite++;
         memoryLocation = memoryLocation + 1;
         bytesWritten = bytesWritten + 1;
     }
-    
+    bwrite(b);
+    brelse(b);			// release the buffer
 }
