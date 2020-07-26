@@ -42,3 +42,10 @@ volatile int errorOccurred = 0;
 // ----------------------------------------------------------------------------
 
 int block_no, off; // current unused log block, offset this current block
+
+// Memory Allocator
+// ----------------------------------------------------------------------------
+
+Page pages[NUM_PAGES];      // Pages array
+PageList freePageList;      // Doubly Linked List (DLL) of Free Pages
+int numFreePages;

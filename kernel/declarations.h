@@ -1,6 +1,9 @@
 #ifndef DECL
 #define DECL
 
+// Global Constants
+#define NULL 0
+
 // Types
 // ----------------------------------------------------------------------------
 
@@ -323,5 +326,28 @@ typedef struct Disk {
 } __attribute__ ((aligned (PGSIZE))) Disk;
 
 extern Disk disk;
+
+// Memory Allocator
+// ----------------------------------------------------------------------------
+
+// A linked list node which would represent
+// a memory page
+
+#define START_PAGE 300
+#define END_PAGE 899
+#define NUM_PAGES (END_PAGE - START_PAGE + 1)
+
+typedef struct Page {
+    uint64 pageNum;
+    struct Page *prev, *next;
+} Page;
+
+typedef struct PageList {
+    Page *head, *tail;
+} PageList;
+
+extern Page pages[NUM_PAGES];
+extern PageList freePageList;
+extern int numFreePages;
 
 #endif
