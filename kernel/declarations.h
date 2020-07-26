@@ -142,8 +142,8 @@ extern char digits[];
 typedef struct KernelSaveArea {
     uint64 reg[NREG];           // Register Save Area
     uint64 epc;                 // Exception Program Counter
-    uint64 mstatus;             // Value of sstatus register
-} KernelSaveArea;
+    uint64 mstatus;             // Value of mstatus register
+} __attribute__((packed)) KernelSaveArea;
 
 extern KernelSaveArea ksa;
 
@@ -334,5 +334,72 @@ typedef uint64 PageNode;
 
 extern PageNode pages[NUM_PAGES];
 extern int currFreePageNode, numFreePages;
+
+// ELF
+// -----------------------------------------------------------------------------
+
+// Format of an ELF executable file
+
+#define ELF_MAGIC 0x464C457FU  // "\x7FELF" in little endian
+
+// File header
+typedef struct Elfhdr {
+  uint magic;       // must equal ELF_MAGIC
+  uchar elf[12];
+  ushort type;
+  ushort machine;
+  uint version;
+  uint64 entry;
+  uint64 phoff;
+  uint64 shoff;
+  uint flags;
+  ushort ehsize;
+  ushort phentsize;
+  ushort phnum;
+  ushort shentsize;
+  ushort shnum;
+  ushort shstrndx;
+} Elfhdr;
+
+// Program section header
+typedef struct Proghdr {
+  uint32 type;
+  uint32 flags;
+  uint64 off;   // Offset of program section within ELF file
+  uint64 vaddr; // Virtual Address where corresponding section must be loaded
+  uint64 paddr; // Physical Address - To Be Ignored
+  uint64 filesz;// Size of program section
+  uint64 memsz; // Size of memory of program section
+  uint64 align;
+} Proghdr;
+
+// ELF Reader - Doubly Linked List Node of the Linked List
+// which would be returned by elf reader function
+typedef struct Elfread {
+  uint64 off;   // Offset of program section within ELF file
+  uint64 vaddr; // Virtual Address where corresponding section must be loaded
+  uint64 filesz;// Size of program section
+  uint64 memsz; // Size of memory of program section
+  struct Elfread *prev, *next;
+} Elfread;
+
+// ELF Reader List - Doubly Linked List
+typedef struct ElfreadList {
+  Elfread *head, *tail;
+} ElfreadList;
+
+// maximum number of ElfRead nodes that can be
+// allocated
+#define ELFSIZE                 30
+
+// Values for Proghdr type
+#define ELF_PROG_LOAD           1
+
+// Flag bits for Proghdr flags
+#define ELF_PROG_FLAG_EXEC      1
+#define ELF_PROG_FLAG_WRITE     2
+#define ELF_PROG_FLAG_READ      4
+
+extern Elfread elfNodes[ELFSIZE];
 
 #endif
