@@ -26,10 +26,11 @@ void kernelInterruptHandler() {
     uint64 mcause = r_mcause();     // Get the cause of exception/interrupt
 
     // Check if is an interrupt or exception
-    if(mcause & (1ull << 63ull)) {  // Interrupt
+    // 0x8000000000000000L -> 63rd bit is set (0-index based)
+    if(mcause & 0x8000000000000000L) {  // Interrupt
 
         // If not an external interrupt, then error out
-        if((mcause & ((1ull << 63ull) - 1)) != 11)
+        if((mcause & 0xff) != 11)
             error("trap: Exception other than external");
         
         // Handle the device interrupt
