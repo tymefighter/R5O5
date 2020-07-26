@@ -72,3 +72,75 @@ void brelse(Buffer *b) {
         bcache.head.next = b;
     }
 }
+
+// Read `nBytes` bytes from disk block `diskBlockNum` at offset `offset`
+// to the memory location specified by `memoryLocation`
+void readBytes(
+    int diskBlockNum,
+    int offset,
+    int nBytes,
+    uchar *memoryLocation
+) {
+    if(diskBlockNum >= DISKSIZE)
+        error("readBytes: block exceeds disk size");
+
+    int nextBytePosToRead = offset;
+    int bytesRead = 0;
+    Buffer* b = bread(diskBlockNum);
+
+    while(bytesRead < nBytes) {
+        if(nextBytePosToRead == BSIZE) {
+            brelse(b);      // release the buffer
+            diskBlockNum ++;
+            if(diskBlockNum >= DISKSIZE)
+                error("readBytes: block exceeds disk size");
+
+            b = bread(diskBlockNum);
+            nextBytePosToRead = 0;
+        }
+
+        *memoryLocation = (b -> data)[nextBytePosToRead];
+        nextBytePosToRead ++;
+        memoryLocation ++;
+        bytesRead ++;
+    }
+
+    brelse(b);				// release the buffer
+}
+
+// Write `nBytes` bytes to disk block `diskBlockNum` at offset `offset`
+// from the memory location specified by `memoryLocation`
+void writeBytes(
+    int diskBlockNum,
+    int offset,
+    int nBytes,
+    uchar *memoryLocation
+) {
+    if(diskBlockNum >= DISKSIZE)
+        error("writeBytes: block exceeds disk size");
+
+    int nextBytePosToWrite = offset;
+    int bytesWritten = 0;
+    Buffer* b = bread(diskBlockNum);
+
+    while(bytesWritten < nBytes) {
+        if(nextBytePosToWrite == BSIZE) {
+	  		bwrite(b);  // write changes made in the buffer to the disk block
+            brelse(b);  // release the buffer
+            diskBlockNum ++;
+            if(diskBlockNum >= DISKSIZE)
+                error("writeBytes: block exceeds disk size");
+
+            b = bread(diskBlockNum);
+            nextBytePosToWrite = 0;
+        }
+
+        (b -> data)[nextBytePosToWrite] = *memoryLocation;
+        nextBytePosToWrite ++;
+        memoryLocation ++;
+        bytesWritten ++;
+    }
+
+    bwrite(b);      // write changes made in the buffer to the disk block
+    brelse(b);      // release the buffer
+}
