@@ -55,6 +55,25 @@ void            allocatePages(uint64, uint64[]);
 void            freePage(uint64);
 void            freePages(uint64, uint64[]);
 
+// paging.c
+uint64          getOffset(uint64);
+uint64          getVirtPage(VirtualAddress);
+uint64          getPhyPage(PhysicalAddress);
+uint64          getL2(VirtualAddress);
+uint64          getL1(VirtualAddress);
+uint64          getL0(VirtualAddress);
+uint64          getFlags(PageTableEntry);
+uint64          getPageNum(PageTableEntry);
+void            setFlags(PageTableEntry *, Bool, Bool, Bool);
+void            setPageNum(PageTableEntry *, uint64);
+PageDirectory * allocatePageDirectory();
+PageTable *     allocatePageTable();
+Bool            isVirtualPageAllocated(PageTable *,uint64);
+void            mapVirtualPage(PageTable *, uint64, uint64, Bool, Bool, Bool);
+void            allocateVirtualPage(PageTable *, uint64, Bool, Bool, Bool);
+PhysicalAddress virtualToPhysical(PageTable *, VirtualAddress);
+void            deallocatePageTable(PageTable *);
+
 // kernelvec.S
 void            kernelvec(void);
 
