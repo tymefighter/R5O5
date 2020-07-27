@@ -1,5 +1,8 @@
 # Interrupts in while in machine mode come here
 # this code => push all registers, call kerneltrap(), restore, return.
+# kernelvec saves the registers on the stack of the interrupted kernel thread
+# satp set to kernel page table
+
 .globl kernelInterruptHandler
 .globl kernelvec
 .globl ksa
@@ -47,7 +50,11 @@ kernelvec:
         sd sp, 8(t0)                    # save sp now
         sd t1, 32(t0)                   # store value of t0 into the save area
 	                        
-        call kernelInterruptHandler     # call the C trap handler in trap.c
+        call kernelInterruptHandler     # call the C trap handler in trap.c to deal with kernel traps
+                                        # trap.c deals with device interrupts and exceptions
+                                        # if trap.c is called by a timer interrupt, it yields to give other threads a chance to return
+                                        # later control returns to the initial thread through yield called by some other threads
+                                        #after this line control returns, we have to restore the previously saved registers
 
         la t0, ksa                      # load address of kernel save area into t0
                                 
@@ -85,4 +92,4 @@ kernelvec:
 
         ld t0, 32(t0)           # load t0's value into t0
 
-        mret                    # return to whatever we were doing in the kernel.
+        mret                    # copies sepc to pc, return to whatever we were doing in the kernel.
