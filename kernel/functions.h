@@ -50,10 +50,10 @@ void            logData(char *prt_str);
 
 // memoryAllocator.c
 void            pageAllocInit(void);
-Page *          allocatePage();
-void            allocatePages(int, PageList *);
-void            freePage(Page *);
-void            freePages(PageList *);
+uint64          allocatePage();
+void            allocatePages(uint64, uint64[]);
+void            freePage(uint64);
+void            freePages(uint64, uint64[]);
 
 // kernelvec.S
 void            kernelvec(void);
