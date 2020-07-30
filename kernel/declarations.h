@@ -337,17 +337,9 @@ extern Disk disk;
 #define END_PAGE 899
 #define NUM_PAGES (END_PAGE - START_PAGE + 1)
 
-typedef struct Page {
-    uint64 pageNum;
-    struct Page *prev, *next;
-} Page;
+typedef uint64 PageNode;
 
-typedef struct PageList {
-    Page *head, *tail;
-} PageList;
-
-extern Page pages[NUM_PAGES];
-extern PageList freePageList;
-extern int numFreePages;
+extern PageNode pages[NUM_PAGES];
+extern int currFreePageNode, numFreePages;
 
 #endif

@@ -46,6 +46,9 @@ int block_no, off; // current unused log block, offset this current block
 // Memory Allocator
 // ----------------------------------------------------------------------------
 
-Page pages[NUM_PAGES];      // Pages array
-PageList freePageList;      // Doubly Linked List (DLL) of Free Pages
+// Stack of Pages implemented using a fixed length array
+PageNode pages[NUM_PAGES];
+// Number of Available Free Pages
 int numFreePages;
+// Index of page node at the top of the stack of pages
+int currFreePageNode;
