@@ -202,8 +202,6 @@ extern int block_no, off;
 // from physical address 0x80000000 to PHYSTOP.
 #define KERNBASE 0x80000000L
 #define PHYSTOP (KERNBASE + 128*1024*1024)
-#define PROCESS_START (PHYSTOP + PGSIZE)
-#define PROCESS_END (PHYSTOP + 20 * PGSIZE)
 
 // UART
 // ----------------------------------------------------------------------------
