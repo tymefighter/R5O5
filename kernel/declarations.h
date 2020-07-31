@@ -140,6 +140,16 @@ typedef struct KernelSaveArea {
 
 extern KernelSaveArea ksa;
 
+// user Save area
+typedef struct UserSaveArea {
+    uint64 ia;                  // program counter
+    uint psw;                   // program status word
+                                // [bit 0 indicates user[0] or kernel[1] mode]
+                                // [bit 1 indicates interrupts disabled[0] or enabled]
+    // PageTable* pagetable;
+    uint64 reg[NREG];           // SOS mentions 32 but NREG is 31, okay?
+} UserSaveArea;
+
 // Debug
 // ----------------------------------------------------------------------------
 
