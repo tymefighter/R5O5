@@ -58,6 +58,10 @@ void            freePages(uint64, uint64[]);
 // kernelvec.S
 void            kernelvec(void);
 
+//elfReader.c
+void            allocateELFReader(ElfreadList *, int *, uint64, uint64, uint64, uint64);
+void            elfReader(uint64, uint64, uint64, uint64, ElfreadList *);
+
 // System Functions
 
 // get current core
