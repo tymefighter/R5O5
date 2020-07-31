@@ -3,6 +3,8 @@
 
 // Global Constants
 #define NULL 0
+#define FALSE 0
+#define TRUE 1
 
 // Types
 // ----------------------------------------------------------------------------
@@ -146,6 +148,16 @@ typedef struct KernelSaveArea {
 } KernelSaveArea;
 
 extern KernelSaveArea ksa;
+
+// user Save area
+typedef struct UserSaveArea {
+    uint64 ia;                  // program counter
+    uint psw;                   // program status word
+                                // [bit 0 indicates user[0] or kernel[1] mode]
+                                // [bit 1 indicates interrupts disabled[0] or enabled]
+    // PageTable* pagetable;
+    uint64 reg[NREG];           // SOS mentions 32 but NREG is 31, okay?
+} UserSaveArea;
 
 // Debug
 // ----------------------------------------------------------------------------
@@ -334,5 +346,28 @@ typedef uint64 PageNode;
 
 extern PageNode pages[NUM_PAGES];
 extern int currFreePageNode, numFreePages;
+
+// process abstraction
+
+#define PROCESS_SIZE 512*1024
+// assuming PROCESS_START is the start of process area
+#define NUMBER_OF_PROCESSES 20
+
+typedef enum ProcessState {Ready = 0, Running = 1, Blocked = 2} ProcessState;
+typedef unsigned int Pid;
+
+typedef struct  ProcessDescriptor {
+    uint slotAllocated;
+    uint timeLeft;
+    ProcessState state;
+    UserSaveArea sa;
+} ProcessDescriptor;
+
+extern int currentProcess;
+extern ProcessDescriptor pd[NUMBER_OF_PROCESSES];
+extern Pid pid;
+
+// SYSTEM CALL numbers
+#define CREATE_PROCESS_SYS_CALL 1
 
 #endif
