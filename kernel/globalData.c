@@ -52,3 +52,8 @@ PageNode pages[NUM_PAGES];
 int numFreePages;
 // Index of page node at the top of the stack of pages
 int currFreePageNode;
+
+// process abstraction
+ProcessDescriptor pd[NUMBER_OF_PROCESSES];
+int currentProcess;
+Pid pid;
