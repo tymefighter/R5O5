@@ -1,22 +1,6 @@
 K=kernel
+T=tests/kernel
 U=user
-
-OBJS = \
-  $K/entry.o \
-  $K/console.o \
-  $K/print.o \
-  $K/uart.o \
-  $K/string.o \
-  $K/main.o \
-  $K/interruptHandler.o \
-  $K/buffer.o \
-  $K/kernelvec.o \
-  $K/plic.o \
-  $K/disk.o \
-  $K/debug.o \
-  $K/globalData.o \
-  $K/memoryAllocator.o \
-  $K/elfReader.o
 
 ifndef TOOLPREFIX
 TOOLPREFIX := $(shell if riscv64-unknown-elf-objdump -i 2>&1 | grep 'elf64-big' >/dev/null 2>&1; \
@@ -65,32 +49,18 @@ $K/kernel: $(OBJS) $K/kernel.ld
 # 	$(OBJCOPY) -S -O binary $U/initcode.out $U/initcode
 # 	$(OBJDUMP) -S $U/initcode.o > $U/initcode.asm
 
-ULIB = # $U/ulib.o $U/usys.o $U/printf.o $U/umalloc.o
+ULIB = 
 
 $U/_%: $U/%.o $(ULIB)
 	$(LD) $(LDFLAGS) -N -e main -Ttext 0 -o $@ $^
 	$(OBJDUMP) -S $@ > $U/$*.asm
 	$(OBJDUMP) -t $@ | sed '1,/SYMBOL TABLE/d; s/ .* / /; /^$$/d' > $U/$*.sym
 
-# Prevent deletion of intermediate files, e.g. cat.o, after first build, so
-# that disk image changes after first build are persistent until clean.  More
-# details:
-# http://www.gnu.org/software/make/manual/html_node/Chained-Rules.html
 .PRECIOUS: %.o
-
-mkfs/r5o5_mkfs: mkfs/r5o5_mkfs.c
-	gcc -o mkfs/r5o5_mkfs mkfs/r5o5_mkfs.c
 
 UPROGS := 
 
-fs.img: mkfs/r5o5_mkfs $(UPROGS)
-	mkfs/r5o5_mkfs fs.img $(UPROGS)
-
 -include kernel/*.d user/*.d
-
-log: logs/getLogInfo.c
-	@gcc -o getLogInfo logs/getLogInfo.c
-	@./getLogInfo
 
 clean: 
 	rm -f *.tex *.dvi *.idx *.aux *.log *.ind *.ilg \
@@ -101,7 +71,12 @@ clean:
 	$(UPROGS) \
 	$U/*.d $U/*.o $U/*.sym $U/*.asm \
 	getLogInfo \
-	information/prog_info
+	information/prog_info \
+
+	$T/*.o $T/*.d \
+	fs_test.img \
+	tests/mkfs_test
+
 
 # try to generate a unique GDB port
 GDBPORT = $(shell expr `id -u` % 5000 + 25000)
@@ -117,12 +92,68 @@ QEMUEXTRA = -drive file=fs1.img,if=none,format=raw,id=x1 -device virtio-blk-devi
 QEMUOPTS = -machine virt -bios none -kernel $K/kernel -m 3G -smp $(CPUS) -nographic
 QEMUOPTS += -drive file=fs.img,if=none,format=raw,id=x0 -device virtio-blk-device,drive=x0,bus=virtio-mmio-bus.0
 
+# OS
+
+OBJS = \
+  $K/entry.o \
+  $K/console.o \
+  $K/print.o \
+  $K/uart.o \
+  $K/string.o \
+  $K/main.o \
+  $K/interruptHandler.o \
+  $K/buffer.o \
+  $K/kernelvec.o \
+  $K/plic.o \
+  $K/disk.o \
+  $K/debug.o \
+  $K/globalData.o \
+  $K/memoryAllocator.o \
+  $K/elfReader.o
+
+mkfs/r5o5_mkfs: mkfs/r5o5_mkfs.c
+	gcc -o mkfs/r5o5_mkfs mkfs/r5o5_mkfs.c
+
+fs.img: mkfs/r5o5_mkfs $(UPROGS)
+	mkfs/r5o5_mkfs fs.img $(UPROGS)
+
+log: logs/getLogInfo.c
+	@gcc -o getLogInfo logs/getLogInfo.c
+	@./getLogInfo
+
 qemu: $K/kernel fs.img
 	$(QEMU) $(QEMUOPTS)
 
-.gdbinit: .gdbinit.tmpl-riscv
-	sed "s/:1234/:$(GDBPORT)/" < $^ > $@
+# Test
 
-qemu-gdb: $K/kernel .gdbinit fs.img
-	@echo "*** Now run 'gdb' in another window." 1>&2
-	$(QEMU) $(QEMUOPTS) -S $(QEMUGDB)
+OBJS_TEST = \
+  $K/entry.o \
+  $K/console.o \
+  $K/print.o \
+  $K/uart.o \
+  $K/string.o \
+  $K/interruptHandler.o \
+  $K/buffer.o \
+  $K/kernelvec.o \
+  $K/plic.o \
+  $K/disk.o \
+  $K/debug.o \
+  $K/globalData.o \
+  $K/memoryAllocator.o \
+  $K/elfReader.o \
+  $T/main.o \
+  $T/test.o
+
+$K/kernel_test: $(OBJS_TEST) $K/kernel.ld
+	$(LD) $(LDFLAGS) -T $K/kernel.ld -o $K/kernel $(OBJS) 
+	$(OBJDUMP) -S $K/kernel > $K/kernel.asm
+	$(OBJDUMP) -t $K/kernel | sed '1,/SYMBOL TABLE/d; s/ .* / /; /^$$/d' > $K/kernel.sym
+
+tests/mkfs_test: tests/mkfs_test.c
+	gcc -o tests/mkfs_test tests/mkfs_test.c
+
+fs_test.img: tests/mkfs_test $(UPROGS)
+	tests/mkfs_test fs_test.img $(UPROGS)
+
+test: $K/kernel_test fs_test.img
+	$(QEMU) $(QEMUOPTS)
