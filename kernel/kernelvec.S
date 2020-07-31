@@ -2,7 +2,7 @@
 # this code => push all registers, call kerneltrap(), restore, return.
 .globl kernelInterruptHandler 
 .globl kernelvec   #this will  makes the kernelvec visible to linker or symbol name will be added to symbol table
-.globl ksa       # kernel save area.
+.globl ksa       # for using kernel save area(ksa) we need to declare it as .globl ksa (which was defined in declarations.h)
 .align 4        #this will make each instruction of length 4 bytes
 kernelvec:
  
