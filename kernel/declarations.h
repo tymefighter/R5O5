@@ -407,7 +407,8 @@ typedef struct ElfreadList {
 
 extern Elfread elfNodes[ELFSIZE];
 
-// process abstraction
+// Process Abstraction
+// -----------------------------------------------------------------------------
 
 #define PROCESS_SIZE (20 * BSIZE)
 #define NUMBER_OF_PROCESSES 20
