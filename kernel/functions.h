@@ -9,6 +9,8 @@ void            bpin(Buffer *);
 void            bunpin(Buffer *);
 void            readBytes(int, int, int, uchar *);
 void            writeBytes(int, int, int, uchar *);
+void            readBytesVirtual(int, int, int, uchar *, PageTable *);
+void            writeBytesVirtual(int, int, int, uchar *, PageTable *);
 
 // console.c
 void            consoleinit(void);
