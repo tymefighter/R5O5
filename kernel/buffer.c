@@ -76,16 +76,16 @@ void brelse(Buffer *b) {
 // Read `nBytes` bytes from disk block `diskBlockNum` at offset `offset`
 // to the memory location specified by `memoryLocation`
 void readBytes(
-    int diskBlockNum,
-    int offset,
-    int nBytes,
+    uint64 diskBlockNum,
+    uint64 offset,
+    uint64 nBytes,
     uchar *memoryLocation
 ) {
     if(diskBlockNum >= DISKSIZE)
         error("readBytes: block exceeds disk size");
 
-    int nextBytePosToRead = offset;
-    int bytesRead = 0;
+    uint64 nextBytePosToRead = offset;
+    uint64 bytesRead = 0;
     Buffer* b = bread(diskBlockNum);
 
     while(bytesRead < nBytes) {
@@ -111,16 +111,16 @@ void readBytes(
 // Write `nBytes` bytes to disk block `diskBlockNum` at offset `offset`
 // from the memory location specified by `memoryLocation`
 void writeBytes(
-    int diskBlockNum,
-    int offset,
-    int nBytes,
+    uint64 diskBlockNum,
+    uint64 offset,
+    uint64 nBytes,
     uchar *memoryLocation
 ) {
     if(diskBlockNum >= DISKSIZE)
         error("writeBytes: block exceeds disk size");
 
-    int nextBytePosToWrite = offset;
-    int bytesWritten = 0;
+    uint64 nextBytePosToWrite = offset;
+    uint64 bytesWritten = 0;
     Buffer* b = bread(diskBlockNum);
 
     while(bytesWritten < nBytes) {
@@ -149,17 +149,17 @@ void writeBytes(
 // address `memoryLocation`, every incremented virtual address is checked
 // for its validity using `virtualToPhysical` function
 void readBytesVirtual(
-    int diskBlockNum,
-    int offset,
-    int nBytes,
+    uint64 diskBlockNum,
+    uint64 offset,
+    uint64 nBytes,
     uchar *memoryLocation,
     PageTable *pagetable
 ) {
     if(diskBlockNum >= DISKSIZE)
         error("readBytesVirtual: block exceeds disk size");
 
-    int nextBytePosToRead = offset;
-    int bytesRead = 0;
+    uint64 nextBytePosToRead = offset;
+    uint64 bytesRead = 0;
     Buffer* b = bread(diskBlockNum);
 
     while(bytesRead < nBytes) {
@@ -190,17 +190,17 @@ void readBytesVirtual(
 // address `memoryLocation`, every incremented virtual address is checked
 // for its validity using `virtualToPhysical` function
 void writeBytesVirtual(
-    int diskBlockNum,
-    int offset,
-    int nBytes,
+    uint64 diskBlockNum,
+    uint64 offset,
+    uint64 nBytes,
     uchar *memoryLocation,
     PageTable* pagetable
 ) {
     if(diskBlockNum >= DISKSIZE)
         error("writeBytesVirtual: block exceeds disk size");
 
-    int nextBytePosToWrite = offset;
-    int bytesWritten = 0;
+    uint64 nextBytePosToWrite = offset;
+    uint64 bytesWritten = 0;
     Buffer* b = bread(diskBlockNum);
 
     while(bytesWritten < nBytes) {
