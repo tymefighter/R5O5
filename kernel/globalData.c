@@ -61,5 +61,6 @@ Elfread elfNodes[ELFSIZE];
 // Process Abstraction
 // ----------------------------------------------------------------------------
 
+// Process Executing currenlty on the CPU
 ProcessDescriptor pd[NUMBER_OF_PROCESSES];
-int currentProcess;
+Pid currentProcess; // Process Executing currenlty on the CPU

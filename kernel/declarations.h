@@ -140,16 +140,6 @@ typedef struct KernelSaveArea {
 
 extern KernelSaveArea ksa;
 
-// user Save area
-typedef struct UserSaveArea {
-    uint64 ia;                  // program counter
-    uint psw;                   // program status word
-                                // [bit 0 indicates user[0] or kernel[1] mode]
-                                // [bit 1 indicates interrupts disabled[0] or enabled]
-    // PageTable* pagetable;
-    uint64 reg[NREG];           // SOS mentions 32 but NREG is 31, okay?
-} UserSaveArea;
-
 // Debug
 // ----------------------------------------------------------------------------
 
@@ -413,20 +403,33 @@ extern Elfread elfNodes[ELFSIZE];
 #define PROCESS_SIZE (20 * BSIZE)
 #define NUMBER_OF_PROCESSES 20
 
-typedef enum ProcessState {
-    Ready = 0, Running = 1, Blocked = 2
-} ProcessState;
-typedef unsigned int Pid;
+// User Save Area
+typedef struct UserSaveArea {
+    uint64 reg[NREG];           // Register Save Area
+    uint64 epc;                 // Exception Program Counter
+    PageTable *pagetable;       // Address of page table of process
+} __attribute__((packed)) UserSaveArea;
 
-typedef struct  ProcessDescriptor {
-    uint slotAllocated;
-    uint timeLeft;
-    ProcessState state;
-    UserSaveArea sa;
+// ProcessState - State in which the process is in
+typedef enum ProcessState {
+    READY = 0,      // Process is Ready to be Scheduled
+    RUNNING = 1,    // Process is currently Running on CPU
+    BLOCKED = 2     // Process is Blocked and waiting of some event
+} ProcessState;
+
+// Process ID type
+typedef uint Pid;
+
+// Process Descriptor Table Entry structure
+typedef struct ProcessDescriptor {
+    Bool slotAllocated;     // True if Slot Allocated, else False
+    uint64 timeLeft;        // Amount of time the process is given to execute
+    ProcessState state;     // State the Process is in currently
+    UserSaveArea sa;        // Save Area of Process
 } ProcessDescriptor;
 
-extern int currentProcess;
-extern ProcessDescriptor pd[NUMBER_OF_PROCESSES];
+extern Pid currentProcess;  // Process Executing currenlty on the CPU
+extern ProcessDescriptor pd[NUMBER_OF_PROCESSES];   // Process Table
 
 #endif
 // process abstraction
