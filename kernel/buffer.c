@@ -144,3 +144,87 @@ void writeBytes(
     bwrite(b);      // write changes made in the buffer to the disk block
     brelse(b);      // release the buffer
 }
+
+// function which reads `nBytes` bytes from the disk starting from the virtual
+// address `memoryLocation`, every incremented virtual address is checked
+// for its validity using `virtualToPhysical` function
+void readBytesVirtual(
+    int diskBlockNum,
+    int offset,
+    int nBytes,
+    uchar *memoryLocation,
+    PageTable *pagetable
+) {
+    if(diskBlockNum >= DISKSIZE)
+        error("readBytesVirtual: block exceeds disk size");
+
+    int nextBytePosToRead = offset;
+    int bytesRead = 0;
+    Buffer* b = bread(diskBlockNum);
+
+    while(bytesRead < nBytes) {
+        if(nextBytePosToRead == BSIZE) {
+            brelse(b);      // release the buffer
+            diskBlockNum ++;
+            if(diskBlockNum >= DISKSIZE)
+                error("readBytesVirtual: block exceeds disk size");
+
+            b = bread(diskBlockNum);
+            nextBytePosToRead = 0;
+        }
+
+        VirtualAddress virtualaddr = (VirtualAddress)memoryLocation;
+        PhysicalAddress physicaladdr = virtualToPhysical(pagetable, virtualaddr);
+        uchar* physicalAddrLocation = (uchar*)physicaladdr;
+        *physicalAddrLocation = (b -> data)[nextBytePosToRead];
+
+        nextBytePosToRead ++;
+        memoryLocation ++;
+        bytesRead ++;
+    }
+
+    brelse(b);				// release the buffer
+}
+
+// function which writes `nBytes` bytes to the disk starting from the virtual
+// address `memoryLocation`, every incremented virtual address is checked
+// for its validity using `virtualToPhysical` function
+void writeBytesVirtual(
+    int diskBlockNum,
+    int offset,
+    int nBytes,
+    uchar *memoryLocation,
+    PageTable* pagetable
+) {
+    if(diskBlockNum >= DISKSIZE)
+        error("writeBytesVirtual: block exceeds disk size");
+
+    int nextBytePosToWrite = offset;
+    int bytesWritten = 0;
+    Buffer* b = bread(diskBlockNum);
+
+    while(bytesWritten < nBytes) {
+        if(nextBytePosToWrite == BSIZE) {
+	  		bwrite(b);  // write changes made in the buffer to the disk block
+            brelse(b);  // release the buffer
+            diskBlockNum ++;
+            if(diskBlockNum >= DISKSIZE)
+                error("writeBytesVirtual: block exceeds disk size");
+
+            b = bread(diskBlockNum);
+            nextBytePosToWrite = 0;
+        }
+
+        VirtualAddress virtualaddr = (VirtualAddress)memoryLocation;
+        PhysicalAddress physicaladdr = virtualToPhysical(pagetable, virtualaddr);
+        uchar* physicalAddrLocation = (uchar*)physicaladdr;
+        (b -> data)[nextBytePosToWrite] = *physicalAddrLocation;
+
+        nextBytePosToWrite ++;
+        memoryLocation ++;
+        bytesWritten ++;
+    }
+
+    bwrite(b);      // write changes made in the buffer to the disk block
+    brelse(b);      // release the buffer
+}
