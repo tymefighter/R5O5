@@ -11,11 +11,12 @@ OBJS = \
   $K/interruptHandler.o \
   $K/buffer.o \
   $K/kernelvec.o \
+  $K/uservec.o \
   $K/plic.o \
   $K/disk.o \
   $K/debug.o \
-  $K/globalData.o \
   $K/memoryAllocator.o \
+  $K/globalData.o \
   $K/elfReader.o \
   $K/paging.o \
   $K/createProcess.o

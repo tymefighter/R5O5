@@ -32,16 +32,14 @@ typedef unsigned long uint64;
 
 // Bits in Machine Status Register, mstatus
 #define MSTATUS_MPP_MASK (3L << 11) // previous mode.
-#define MSTATUS_MPP_M (3L << 11)    // machine-mode previous privilege is machine
-#define MSTATUS_MPP_S (1L << 11)    // machine-mode previous privilege is superv
-#define MSTATUS_MPP_U (0L << 11)    // machine-mode previous privilege is user
+#define MSTATUS_MPP (3L << 11)      // machine-mode previous privilege is machine
 #define MSTATUS_MIE (1L << 3)       // machine-mode interrupt enable
 #define MSTATUS_MPIE (1L << 7)      // machine-mode previous interrupt enable
 
 // Bits in Machine-mode Interrupt Enable, mie
-#define MIE_MEIE (1L << 11)             // external interrupt
-#define MIE_MTIE (1L << 7)              // timer interrupt
-#define MIE_MSIE (1L << 3)              // software interrupt
+#define MIE_MEIE (1L << 11)             // machine mode external interrupt
+#define MIE_MTIE (1L << 7)              // machine mode timer interrupt
+#define MIE_MSIE (1L << 3)              // machine mode software interrupt
 
 // Paging
 // ----------------------------------------------------------------------------
@@ -397,4 +395,26 @@ typedef struct ElfreadList {
 
 extern Elfread elfNodes[ELFSIZE];
 
+// Process Descriptor Table
+// --------------------------------------------------------------------------
+
+#define TimeQuantum 100000
+
+typedef enum ProcessState {CREATED, READY, RUNNING} ProcessState;
+
+typedef struct SaveArea {
+  uint64 reg[NREG];
+  uint64 epc;
+  uint64 satp;
+} __attribute__((packed)) SaveArea;
+
+typedef struct ProcessDescriptor {
+  SaveArea sa;
+  Bool slotAllocated;
+  uint64 timeLeft;
+  ProcessState state;
+} __attribute__((packed)) ProcessDescriptor;
+
+extern ProcessDescriptor pd[NPROC];
+extern int currentProcess;
 #endif

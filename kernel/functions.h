@@ -27,6 +27,7 @@ void*           memset(void*, int, uint);
 
 // interruptHandler.c
 void            kernelInterruptInit(void);
+void            userInterruptHandler(void);
 
 // uart.c
 void            uartinit(void);
@@ -78,6 +79,10 @@ void            deallocatePageTable(PageTable *);
 
 // kernelvec.S
 void            kernelvec(void);
+
+// uservec.S
+void            uservec(void);
+void            userret(void);
 
 // elfReader.c
 void            allocateELFReader(ElfreadList *, int *, uint64, uint64, uint64, uint64);
