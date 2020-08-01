@@ -1,8 +1,10 @@
 #ifndef DECL
 #define DECL
 
-// Global Constants
+// Global
+
 #define NULL 0
+typedef enum Bool {True = 1, False = 0} Bool;
 
 // Types
 // ----------------------------------------------------------------------------
@@ -15,8 +17,6 @@ typedef unsigned char uint8;
 typedef unsigned short uint16;
 typedef unsigned int  uint32;
 typedef unsigned long uint64;
-
-typedef uint64 pde_t;
 
 // System
 // ----------------------------------------------------------------------------
@@ -43,36 +43,29 @@ typedef uint64 pde_t;
 #define MIE_MTIE (1L << 7)              // timer interrupt
 #define MIE_MSIE (1L << 3)              // software interrupt
 
-#define SATP_SV39 (8L << 60)
-#define MAKE_SATP(pagetable) (SATP_SV39 | (((uint64)pagetable) >> 12))
+// Paging
+// ----------------------------------------------------------------------------
 
-#define PGROUNDUP(sz)  (((sz)+PGSIZE-1) & ~(PGSIZE-1))
-#define PGROUNDDOWN(a) (((a)) & ~(PGSIZE-1))
+// Number of Page Table Entries per Page Directory
+#define NUM_PTE 512
 
-#define PTE_V (1L << 0) // valid
-#define PTE_R (1L << 1)
-#define PTE_W (1L << 2)
-#define PTE_X (1L << 3)
-#define PTE_U (1L << 4) // 1 -> user can access
+// Page Table Entry Flags
+#define PTE_V (1L << 0) // Entry is valid
+#define PTE_R (1L << 1) // Read Access
+#define PTE_W (1L << 2) // Write Access
+#define PTE_X (1L << 3) // Execute Access
+#define PTE_U (1L << 4) // User can access
 
-// shift a physical address to the right place for a PTE.
-#define PA2PTE(pa) ((((uint64)pa) >> 12) << 10)
-#define PTE2PA(pte) (((pte) >> 10) << 12)
-#define PTE_FLAGS(pte) ((pte) & 0x3FF)
+typedef uint64 VirtualAddress;      // 64 bit Virtual Address
+typedef uint64 PhysicalAddress;     // 64 bit Physical Address
+typedef uint64 PageTableEntry;      // Page Table Entry (64 - bit)
 
-// extract the three 9-bit page table indices from a virtual address.
-#define PXMASK          0x1FF // 9 bits
-#define PXSHIFT(level)  (PGSHIFT+(9*(level)))
-#define PX(level, va) ((((uint64) (va)) >> PXSHIFT(level)) & PXMASK)
+typedef struct PageDirectory {      // Page Directory (512 Page Table Entries)
+    PageTableEntry pageTableEntry[NUM_PTE];
+} __attribute__((packed)) PageDirectory;
+// attribute: Pack it completely (no padding)
 
-// one beyond the highest possible virtual address.
-// MAXVA is actually one bit less than the max allowed by
-// Sv39, to avoid having to sign-extend virtual addresses
-// that have the high bit set.
-#define MAXVA (1L << (9 + 9 + 9 + 12 - 1))
-
-typedef uint64 pte_t;
-typedef uint64 *pagetable_t; // 512 PTEs
+typedef PageDirectory PageTable;    // Page Table - Root Page Directory
 
 // OS Parameters
 // ----------------------------------------------------------------------------
@@ -202,6 +195,7 @@ extern int block_no, off;
 // from physical address 0x80000000 to PHYSTOP.
 #define KERNBASE 0x80000000L
 #define PHYSTOP (KERNBASE + 128*1024*1024)
+extern char end[];  // Location where kernel ends (from here free pages start)
 
 // UART
 // ----------------------------------------------------------------------------
@@ -324,9 +318,12 @@ extern Disk disk;
 // A linked list node which would represent
 // a memory page
 
-#define START_PAGE 300
-#define END_PAGE 899
-#define NUM_PAGES (END_PAGE - START_PAGE + 1)
+// Ceil of end divided by PGSIZE
+#define START_PAGE (((uint64)end + PGSIZE - 1) / PGSIZE)
+// End of free page area (but we use only 500 pages and not entire free area)
+#define END_PAGE (PHYSTOP / PGSIZE)
+// Number of Free Pages
+#define NUM_PAGES (500)
 
 typedef uint64 PageNode;
 
