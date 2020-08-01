@@ -79,9 +79,12 @@ void            deallocatePageTable(PageTable *);
 // kernelvec.S
 void            kernelvec(void);
 
-//elfReader.c
+// elfReader.c
 void            allocateELFReader(ElfreadList *, int *, uint64, uint64, uint64, uint64);
 void            elfReader(uint64, uint64, uint64, uint64, ElfreadList *);
+
+// createProcess.c
+Bool            programLoader(uint64, uint64, uint64, uint64, PageTable *);
 
 // System Functions
 
