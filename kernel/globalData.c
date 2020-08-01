@@ -57,3 +57,6 @@ int currFreePageNode;
 // ----------------------------------------------------------------------------
 
 Elfread elfNodes[ELFSIZE];
+// process abstraction
+ProcessDescriptor pd[NUMBER_OF_PROCESSES];
+int currentProcess;

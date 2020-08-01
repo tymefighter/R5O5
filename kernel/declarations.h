@@ -408,3 +408,24 @@ typedef struct ElfreadList {
 extern Elfread elfNodes[ELFSIZE];
 
 #endif
+// process abstraction
+
+#define PROCESS_SIZE (20 * BSIZE)
+#define NUMBER_OF_PROCESSES 20
+
+typedef enum ProcessState {
+    Ready = 0, Running = 1, Blocked = 2
+} ProcessState;
+typedef unsigned int Pid;
+
+typedef struct  ProcessDescriptor {
+    uint slotAllocated;
+    uint timeLeft;
+    ProcessState state;
+    UserSaveArea sa;
+} ProcessDescriptor;
+
+extern int currentProcess;
+extern ProcessDescriptor pd[NUMBER_OF_PROCESSES];
+
+#endif
