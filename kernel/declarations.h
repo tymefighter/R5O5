@@ -409,11 +409,12 @@ extern Elfread elfNodes[ELFSIZE];
 
 // process abstraction
 
-#define PROCESS_SIZE 512*1024
-// assuming PROCESS_START is the start of process area
+#define PROCESS_SIZE (20 * BSIZE)
 #define NUMBER_OF_PROCESSES 20
 
-typedef enum ProcessState {Ready = 0, Running = 1, Blocked = 2} ProcessState;
+typedef enum ProcessState {
+    Ready = 0, Running = 1, Blocked = 2
+} ProcessState;
 typedef unsigned int Pid;
 
 typedef struct  ProcessDescriptor {
@@ -425,10 +426,6 @@ typedef struct  ProcessDescriptor {
 
 extern int currentProcess;
 extern ProcessDescriptor pd[NUMBER_OF_PROCESSES];
-extern Pid pid;
-
-// SYSTEM CALL numbers
-#define CREATE_PROCESS_SYS_CALL 1
 
 #endif
 // process abstraction
