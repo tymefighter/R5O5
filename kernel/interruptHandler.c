@@ -55,7 +55,7 @@ void userInterruptHandler(void)
         error("userInterruptHandler: not from user mode");
 
     // save user page table register
-    pd[currentProcess].sa.satp = r_satp();
+    pd[currentProcess].sa.satp = (PageTable *)r_satp();
     // save user program counter
     pd[currentProcess].sa.epc = r_mepc();
     
@@ -83,7 +83,7 @@ void userInterruptHandler(void)
     w_mie(r_mie() | MIE_MTIE);
     
     // Restore satp from pagetable address of current process
-    w_satp(pd[currentProcess].sa.satp);
+    w_satp((uint64)pd[currentProcess].sa.satp);
     // Flush TLB
     sfence_vma();
     // Restore mepc from epc of current process

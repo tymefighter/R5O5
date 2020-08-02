@@ -378,11 +378,11 @@ typedef struct Elfread {
 
 // ELF Reader List - Doubly Linked List
 typedef struct ElfreadList {
-  Elfread *head, *tail;
+  uint64 entry; // Entry point of the program
+  Elfread *head, *tail; // head and tail of linked list
 } ElfreadList;
 
-// maximum number of ElfRead nodes that can be
-// allocated
+// maximum number of ElfRead nodes that can be allocated
 #define ELFSIZE                 30
 
 // Values for Proghdr type
@@ -395,17 +395,19 @@ typedef struct ElfreadList {
 
 extern Elfread elfNodes[ELFSIZE];
 
-// Process Descriptor Table
+// Processes
 // --------------------------------------------------------------------------
 
 #define TimeQuantum 100000
+
+typedef uint Pid;
 
 typedef enum ProcessState {CREATED, READY, RUNNING} ProcessState;
 
 typedef struct SaveArea {
   uint64 reg[NREG];
   uint64 epc;
-  uint64 satp;
+  PageTable *satp;
 } __attribute__((packed)) SaveArea;
 
 typedef struct ProcessDescriptor {
