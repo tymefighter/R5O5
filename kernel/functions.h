@@ -89,7 +89,12 @@ void            allocateELFReader(ElfreadList *, int *, uint64, uint64, uint64, 
 void            elfReader(uint64, uint64, uint64, uint64, ElfreadList *);
 
 // createProcess.c
-Bool            programLoader(uint64, uint64, uint64, uint64, PageTable *);
+Bool            programLoader(uint64, uint64, uint64, uint64, Pid);
+Pid             createProcess(uint64, uint64, uint64, uint64);
+
+// algo.c
+uint64          max(uint64, uint64);
+uint64          ceilDiv(uint64, uint64);
 
 // System Functions
 

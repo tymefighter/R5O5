@@ -35,6 +35,8 @@ void elfReader(
     if(elf.magic != ELF_MAGIC)
         return;
 
+    elfRead->entry = elf.entry; // Get Entry point of the process
+
     // Read the program headers and stores in a list.
     uint64 blockNum = startBlock;
     for(
