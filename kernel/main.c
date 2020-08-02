@@ -15,6 +15,7 @@ void main() {
     diskInit();                     // Set up the Disk Driver
     logDataInit();                  // Set up Information Logging Mechanism
     pageAllocInit();                // Set up Page Allocator
+    procesDescriptorInit();         // Set up Process Descriptor Table
 
     logData("This data would be placed into the disk \
     \nfrom the starting of the log blocks\n");

@@ -64,32 +64,10 @@ void userInterruptHandler(void)
     if(mcause & 0x8000000000000000L) {  // Interrupt
 
         if((mcause & 0xff) == 7)  // machine timer interrupt
-            ;// dispatcher();
+            dispatcher();
         else
             error("userInterruptHandler: undefined interrupt occured");
     }
     else // Exception
         error("userInterruptHandler: Exception Occurred");
-    
-    // send syscalls, interrupts, and exceptions to uservec.S
-    w_mtvec((uint64)uservec);
-
-    uint64 x = r_mstatus();
-    x &= ~MSTATUS_MPP;   // Previous Privilege is User Mode
-    x |= MSTATUS_MPIE;   // Indicate that previously interrupts were enabled
-    w_mstatus(x);
-
-    // Enables machine mode timer interrupts in user mode
-    w_mie(r_mie() | MIE_MTIE);
-    
-    // Restore satp from pagetable address of current process
-    w_satp((uint64)pd[currentProcess].sa.satp);
-    // Flush TLB
-    sfence_vma();
-    // Restore mepc from epc of current process
-    w_mepc(pd[currentProcess].sa.epc);
-
-    // Restores user page table and user register values
-    // and finally enters user mode using mret.
-    userret();
 }

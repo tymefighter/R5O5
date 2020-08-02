@@ -96,6 +96,12 @@ Pid             createProcess(uint64, uint64, uint64, uint64);
 uint64          max(uint64, uint64);
 uint64          ceilDiv(uint64, uint64);
 
+// process.c
+void            procesDescriptorInit(void);
+void            selectProcessToRun(void);
+void            runProcess(void);
+void            dispatcher(void);
+
 // System Functions
 
 // get current core
