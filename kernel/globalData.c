@@ -57,3 +57,9 @@ int currFreePageNode;
 // ----------------------------------------------------------------------------
 
 Elfread elfNodes[ELFSIZE];
+
+// Process Table
+// ----------------------------------------------------------------------------
+
+ProcessDescriptor pd[NPROC];
+int currentProcess = 0;
