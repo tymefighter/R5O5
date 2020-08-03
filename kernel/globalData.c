@@ -4,6 +4,7 @@
 // ----------------------------------------------------------------------------
 
 __attribute__ ((aligned (16))) char SystemStack[4096 * NCPU];
+uint64 timeQuantum = 100000;
 
 // Buffer
 // ----------------------------------------------------------------------------
@@ -63,3 +64,9 @@ Elfread elfNodes[ELFSIZE];
 
 ProcessDescriptor pd[NPROC];
 int currentProcess = 0;
+
+// Memory Mapped Timer Registers
+// --------------------------------------------------------------------------
+
+uchar *mtime = (uchar *)CLINT_MTIME;            // mtime register
+uchar *mtimecmp = (uchar *)CLINT_MTIMECMP(0);   // mtimecmp register
