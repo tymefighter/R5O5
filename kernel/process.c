@@ -18,7 +18,7 @@ void selectProcessToRun() {
         &&
         pd[currentProcess].state == READY   // Process is READY
         && 
-        pd[currentProcess].timeLeft > 0     // Process has time left to run
+        pd[currentProcess].timeElapsed < timeQuantum  // Process has time left to run
     ) {
         pd[currentProcess].state = RUNNING; // Run `currentProcess` itself
         return;
@@ -31,8 +31,8 @@ void selectProcessToRun() {
             &&
             pd[currentProcess].state == READY   // Process is READY
         ) {
-            pd[currentProcess].timeLeft = TimeQuantum;  // Assign `TimeQuantum` time
-            pd[currentProcess].state = RUNNING;         // Run `currentProcess` itself
+            pd[currentProcess].timeElapsed = 0;  // Assign `TimeQuantum` time
+            pd[currentProcess].state = RUNNING;  // Run `currentProcess` itself
             return;
         }
         

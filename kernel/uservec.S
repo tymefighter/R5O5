@@ -1,6 +1,9 @@
 	#
         # code to switch between user and kernel space.
     	#
+.globl timeQuantum
+.globl mtime
+.globl mtimecmp
 .globl userInterruptHandler
 .globl SystemStack
 .globl currentProcess
@@ -26,10 +29,13 @@ uservec:
     	mul t0, t0, t1
     	add a0, a0, t0		# current process savearea
 
+        la t0, mtime        # get mtime address into t0
+        ld t0, 0(t0)        # get mtime value into t0
+        sd t0, 268(a0)      # store mtime value in pd[currentProcess].timeElapsed
+
     	ld t0, 0(sp)
     	ld t1, 8(sp)
     	addi sp, sp, 16		# sp restored
-
     	
         sd ra, 0(a0)
         sd sp, 8(a0)
@@ -86,6 +92,14 @@ userret:
     	li t1, 280		    # size of an entry in pd is 280 bytes
     	mul t0, t0, t1
     	add a0, a0, t0		# current process savearea
+
+        ld t0, 268(a0)      # load timeElapsed
+        la t1, mtime        # get address of mtime in t1
+        sd t0, 0(t1)        # store time elapsed into mtime
+        la t0, timeQuantum  # load address of timeQuantum into t0
+        ld t0, 0(t0)        # load timeQuantum value into t0
+        la t1, mtimecmp     # get address of mtimecmp in t1
+        sd t0, 0(t1)        # store time quantum value into mtimecmp
 
         # restore all but a0 from savearea
         ld ra, 0(a0)

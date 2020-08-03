@@ -398,7 +398,7 @@ extern Elfread elfNodes[ELFSIZE];
 // Processes
 // --------------------------------------------------------------------------
 
-#define TimeQuantum 100000
+extern uint64 timeQuantum;
 
 typedef uint Pid;
 
@@ -413,10 +413,17 @@ typedef struct SaveArea {
 typedef struct ProcessDescriptor {
   SaveArea sa;
   Bool slotAllocated;
-  uint64 timeLeft;
+  uint64 timeElapsed;
   ProcessState state;
 } __attribute__((packed)) ProcessDescriptor;
 
 extern ProcessDescriptor pd[NPROC];
 extern int currentProcess;
+
+// Memory Mapped Timer Registers
+// --------------------------------------------------------------------------
+
+extern uchar *mtime;
+extern uchar *mtimecmp; 
+
 #endif

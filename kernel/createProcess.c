@@ -124,6 +124,6 @@ Pid createProcess(
 
     pd[pid].slotAllocated = True;   // Slot has been allocated now
     pd[pid].state = READY;          // Process is Ready to be run
-    pd[pid].timeLeft = TimeQuantum; // Time the process is allowed to run for
+    pd[pid].timeElapsed = 0;        // Time the process is allowed to run for
     return pid;
 }
