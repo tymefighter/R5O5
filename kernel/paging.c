@@ -242,7 +242,7 @@ PhysicalAddress virtualToPhysical(
     VirtualAddress virtualAddress
 ) {
 
-    if(isVirtualPageAllocated(pagetable, getVirtPage(virtualAddress)))
+    if(!isVirtualPageAllocated(pagetable, getVirtPage(virtualAddress)))
         error("virtualToPhysical: virtual address not valid");
 
     uint64 pteL2 = getL2(virtualAddress);
