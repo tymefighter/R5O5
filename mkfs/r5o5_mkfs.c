@@ -1,4 +1,4 @@
-#include<stdio.h>
+#include <stdio.h>
 
 #define BLOCK_SIZE 1024
 #define DISK_SIZE 1000
@@ -7,108 +7,135 @@
 #define PROC_END 299
 #define LOG_START 900
 #define LOG_END 999
-#define get_offset(block_num, off) (BLOCK_SIZE * block_num + offset)
+#define getOffset(blockNum, off) (BLOCK_SIZE * blockNum + off)
 
-void build_disk(FILE *f_disk)
-{
-    for(int blk = 0;blk < DISK_SIZE;blk++)
-    {
-        for(int byte = 0;byte < BLOCK_SIZE;byte++)
-        {
+// Fills the disk with the spaces
+void buildDisk(FILE *disk) {
+  
+    for(int block = 0; block < DISK_SIZE; block++) {
+        for(int byte = 0; byte < BLOCK_SIZE; byte++) {
             char c = ' ';
-            fwrite(&c, 1, 1, f_disk);
+            fwrite(&c, sizeof(char), 1, disk);
         }
     }
 }
 
-void add_program_disk(FILE *f_disk, FILE *f_info, char *proc_file)
-{
-    static int block_num = PROC_START, offset = 0;
-    FILE *fl_proc = fopen(proc_file, "rb");
-    if(!fl_proc)
-    {
-        printf("\033[0;31mError in opening %s\033[0m\n", proc_file);
+// This stores a program on the disk
+// progName -> name of the program
+// info -> file stream for the information file
+// disk -> file stream for the disk file
+// information file -> stores the location of the program
+// in the disk
+void storeProgram(FILE *disk, FILE *info, char *progName) {
+  
+    static int blockNum = PROC_START, offset = 0;
+    FILE *prog = fopen(progName, "rb");
+    if(prog == NULL) {
+        printf("\033[0;31mError: Couldn't open  %s\033[0m\n", progName);
         return;
     }
 
-    if(fseek(f_disk, get_offset(block_num, offset), SEEK_SET) != 0)
-    {
-        printf("\033[0;31mError in seeking disk\033[0m\n");
+    if(fseek(disk, getOffset(blockNum, offset), SEEK_SET) != 0) {
+        printf("\033[0;31mError: Couldn't set the file position\033[0m\n");
         return;
     }
 
-    int prev_block_num = block_num, prev_offset = offset; // Store the previous values, in case there was some error and for prog info
-    int error_occurred = 0;
-    while(1)
-    {
+    // Store the previous values, in case there was some error and for prog info
+    int prevBlockNum = blockNum, prevOffset = offset; 
+    int errorOccurred = 0;
+    
+    while (1) {
+
+        blockNum += offset / BLOCK_SIZE;
+	    offset %= BLOCK_SIZE;
+
         char c;
-        int rd_bytes = fread(&c, 1, 1, fl_proc);
-        if(rd_bytes < 1) // Program had been read
+        int readBytes = fread(&c, sizeof(char), 1, prog);
+
+        // reading completed
+        if(readBytes < 1)
             break;
 
-        if(offset == BLOCK_SIZE) // Block has been completely written, get next block
-        {
-            block_num ++;
-            offset = 0;
-            if(block_num == PROC_END + 1) // All allowed blocks have been used, discard this Program
-            {
-                printf("\033[0;31mProgram %s is not written to disk due to insufficient space\033[0m\n", proc_file);
-                block_num = prev_block_num;
-                offset = prev_offset;
-                error_occurred = 1;
-                break;
-            }
-        }
-        
-        if(fwrite(&c, 1, 1, f_disk) < 1) // Since Program was not completely written to disk, restore previous block num and offset 
-        {
-            printf("\033[0;31mError in writing %s to disk\033[0m\n", proc_file);
-            block_num = prev_block_num;
-            offset = prev_offset;
-            error_occurred = 1;
+        // all the blocks allocated for the process are used
+        // discard the program store
+        if(blockNum >= PROC_END + 1) {
+            printf("\033[0;31mProgram %s couldn't be written"
+                "on the disk due to insufficient space\033[0m\n", progName);
+            blockNum = prevBlockNum;
+            offset = prevOffset;
+            errorOccurred = 1;
             break;
         }
 
-        offset ++; // Increment offset
+        // If the program couldn't be completely written on the  disk,
+        // restore the previous block num and offset 
+        if(fwrite(&c, sizeof(char), 1, disk) < 1) {
+            printf("\033[0;31mError in writing %s"
+                    "on the disk\033[0m\n", progName);
+            blockNum = prevBlockNum;
+            offset = prevOffset;
+            errorOccurred = 1;
+            break;
+        }
+
+        // increment the offset
+        offset ++;
     }
 
-    if(!error_occurred) // If error did not occur, then program was succesfully placed
-    {
-        if(fprintf(f_info, "%s | start-block num: %d, start-offset: %d, end-block num: %d, end-offset: %d\n", proc_file, prev_block_num, prev_offset, block_num, offset) < 0)
-            printf("\033[0;31mError in writing information of %s\033[0m\n", proc_file);
+    // If the program was successfully written,
+    // store the program location in the information file
+    if(!errorOccurred) {
+
+        offset = (offset + BLOCK_SIZE - 1) % BLOCK_SIZE;
+        if (offset == BLOCK_SIZE - 1)
+	        blockNum --;
+	
+        if(
+            fprintf(info,
+		   "%s | start-block num: %d, start-offset: %d,"
+                   " end-block num: %d, end-offset: %d\n",
+		   progName,
+		   prevBlockNum,
+		   prevOffset,
+		   blockNum,
+		   offset) < 0
+        ) {
+            printf("\033[0;31mError in writing information of %s\033[0m\n",
+		    progName);
+        }
     }
+    else
+        printf("\033[0;31mError in placing program %s\033[0m\n", progName);
 
-
-    (void)fclose(fl_proc);
+    (void)fclose(prog);
 }
 
-int main(int argc, char *argv[])
-{
-    if(argc < 2)
-    {
-        printf("\033[0;31mimage file unspecified\033[0m\n");
+// argv[1] -> disk image filename
+// argv[2...] -> program filenames
+int main(int argc, char *argv[]) {
+
+    if(argc < 2) {
+        printf("\033[0;31disk image file unspecified\033[0m\n");
         return 1;
     }
 
-    FILE *f_disk = fopen(argv[1], "w");
-    if(!f_disk)
-    {
+    FILE *disk = fopen(argv[1], "w");
+    if(!disk) {
         printf("\033[0;31mError in creating/opening disk image\033[0m\n");
         return 0;
     }
 
-    FILE *f_info = fopen("information/prog_info", "w");
-    if(!f_info)
-    {
+    FILE *info = fopen("information/prog_info", "w");
+    if(!info) {
         printf("\033[0;31mError in creating program information file\033[0m\n");
         return 0;
     }
+    
+    buildDisk(disk);
+    for(int i = 2; i < argc; i++)
+        storeProgram(disk, info, argv[i]);
 
-    build_disk(f_disk);
-    for(int i = 2;i < argc;i++)
-        add_program_disk(f_disk, f_info, argv[i]);
-
-    (void)fclose(f_info);
-    (void)fclose(f_disk);
+    (void)fclose(info);
+    (void)fclose(disk);
     return 0;
 }
