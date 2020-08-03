@@ -96,15 +96,20 @@ void allocateELFReader(
         elfRead -> head = elfRead -> tail = &elfNodes[0];
         elfRead -> head -> next = elfRead -> head -> prev = NULL;
         *cnt = 1;
-        return;
     }
-
-    Elfread *new = &elfNodes[*cnt];
-    elfRead -> tail -> next = new;
-    new -> prev = elfRead -> tail;
-    new -> next = NULL;
-    elfRead -> tail = new;
-    (*cnt)++;
+    else {
+        Elfread *new = &elfNodes[*cnt];
+        elfRead -> tail -> next = new;
+        new -> prev = elfRead -> tail;
+        new -> next = NULL;
+        elfRead -> tail = new;
+        (*cnt)++;
+    }
+    
+    elfRead->tail->off = off;
+    elfRead->tail->vaddr = vaddr;
+    elfRead->tail->filesz = filesz;
+    elfRead->tail->memsz = memsz;
 
     return;
 }
