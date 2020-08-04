@@ -25,8 +25,9 @@ Bool programLoader(
     if(elfReadList.head == NULL) // If head is null then some error occurred
         return False;
 
-    pd[pid].sa.satp = allocatePageTable();  // Allocate Page Table
-    PageTable *pagetable = pd[pid].sa.satp;
+    
+    PageTable *pagetable = allocatePageTable();
+    pd[pid].sa.satp = MAKE_SATP(pagetable);  // Allocate Page Table
     pd[pid].sa.epc = elfReadList.entry;     // Entry Point into the program
 
     // Virtual Page Number where stack would begin

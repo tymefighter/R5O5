@@ -407,7 +407,7 @@ typedef enum ProcessState {CREATED, READY, RUNNING} ProcessState;
 typedef struct SaveArea {
   uint64 reg[NREG];
   uint64 epc;
-  PageTable *satp;
+  uint64 satp;
 } __attribute__((packed)) SaveArea;
 
 typedef struct ProcessDescriptor {
@@ -419,4 +419,9 @@ typedef struct ProcessDescriptor {
 
 extern ProcessDescriptor pd[NPROC];
 extern uint64 currentProcess;
+
+
+#define SATP_SV39 (8L << 60)
+#define MAKE_SATP(pagetable) (SATP_SV39 | (((uint64)pagetable) >> 12))
+
 #endif

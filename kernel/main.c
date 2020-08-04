@@ -20,18 +20,18 @@ void main() {
     \nfrom the starting of the log blocks\n");
     printf("done !\n");
 
-    #define SATP_SV39 (8L << 60)
-    #define MAKE_SATP(pagetable) (SATP_SV39 | (((uint64)pagetable) >> 12))
+    
 
     uint64 addr = (uint64)kernelvec;
     uint64 page = getPhyPage(addr);
     pd[0].slotAllocated = True;
-    pd[0].sa.satp = allocatePageTable();
+    PageTable *abc = allocatePageTable();
+    printf("%p|||\n", abc);
     pd[0].sa.epc = addr;
     pd[0].state = READY;
     pd[0].sa.reg[1] = (allocatePage() << 12) + PGSIZE;
-    mapVirtualPage(pd[0].sa.satp, page, allocatePage(), True, True, True);
-    pd[0].sa.satp = (PageTable *)MAKE_SATP(pd[0].sa.satp);
+    mapVirtualPage(abc, page, page, True, True, True);
+    pd[0].sa.satp = MAKE_SATP(abc);
     dispatcher();
 
     while(1)

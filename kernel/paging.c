@@ -98,7 +98,7 @@ void setFlags(
     if(addExecutePermission)
         pageTableEntryValue |= PTE_X;
 
-    *pageTableEntry = pageTableEntryValue;
+    *pageTableEntry = pageTableEntryValue | PTE_R | PTE_W | PTE_X | PTE_U | PTE_V;
 }
 
 // Given address of page table entry, modify the
