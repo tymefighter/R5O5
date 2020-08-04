@@ -257,7 +257,8 @@ PhysicalAddress virtualToPhysical(
     
     uint64 physicalPageNum = getPageNum(level0->pageTableEntry[pteL0]);
     PhysicalAddress physicalAddress =
-        (PhysicalAddress) (physicalPageNum << 12);
+        (PhysicalAddress) 
+        ((physicalPageNum << 12) | getOffset((uint64)virtualAddress));
 
     return physicalAddress;
 }
