@@ -55,7 +55,7 @@ void userInterruptHandler(void)
         error("userInterruptHandler: not from user mode");
 
     // save user page table register
-    pd[currentProcess].sa.satp = (PageTable *)r_satp();
+    pd[currentProcess].sa.satp = r_satp();
     // save user program counter
     pd[currentProcess].sa.epc = r_mepc();
     

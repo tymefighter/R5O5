@@ -177,7 +177,7 @@ void mapVirtualPage(
         // page just allocated
         pagetable->pageTableEntry[pteL2] = 
             (PageTableEntry)((pageNum << 10) | PTE_V);
-        setFlags(&(pagetable->pageTableEntry[pteL2]), True, False, False);
+        setFlags(&(pagetable->pageTableEntry[pteL2]), True, True, True); // for now
     }
 
     PageDirectory *level1 = 
@@ -190,7 +190,7 @@ void mapVirtualPage(
         // page just allocated
         level1->pageTableEntry[pteL1] = 
             (PageTableEntry)((pageNum << 10) | PTE_V);
-        setFlags(&(level1->pageTableEntry[pteL1]), True, False, False);
+        setFlags(&(level1->pageTableEntry[pteL1]), True, True, True);
     }
 
     PageDirectory *level0 = 
