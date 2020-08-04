@@ -11,3 +11,4 @@ information/prog_info
 fs.img
 user/*.o
 user/testUser
+.gdbinit
