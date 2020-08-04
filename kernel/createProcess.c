@@ -56,6 +56,8 @@ Bool programLoader(
                     True,   // i.e read, write and exec
                     True
                 );
+
+            printf("%l %l||||\n", currVirtPage, getPhyPage(virtualToPhysical(pagetable, currVirt)));
         }
 
         // Block and offset within the block where current

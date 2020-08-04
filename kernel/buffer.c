@@ -177,6 +177,7 @@ void readBytesVirtual(
         PhysicalAddress physicaladdr = virtualToPhysical(pagetable, virtualaddr);
         uchar* physicalAddrLocation = (uchar*)physicaladdr;
         *physicalAddrLocation = (b -> data)[nextBytePosToRead];
+        printf("%p %p %d\n", memoryLocation, physicalAddrLocation, *physicalAddrLocation);
 
         nextBytePosToRead ++;
         memoryLocation ++;
