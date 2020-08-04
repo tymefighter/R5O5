@@ -143,7 +143,7 @@ extern KernelSaveArea ksa;
 
 #define LOGSTART 900
 
-extern int block_no, off;
+extern uint64 block_no, off;
 
 // Memory Layout
 // ----------------------------------------------------------------------------
@@ -326,7 +326,7 @@ extern Disk disk;
 typedef uint64 PageNode;
 
 extern PageNode pages[NUM_PAGES];
-extern int currFreePageNode, numFreePages;
+extern uint64 currFreePageNode, numFreePages;
 
 // ELF
 // -----------------------------------------------------------------------------
@@ -400,7 +400,7 @@ extern Elfread elfNodes[ELFSIZE];
 
 #define TimeQuantum 100000
 
-typedef uint Pid;
+typedef uint64 Pid;
 
 typedef enum ProcessState {CREATED, READY, RUNNING} ProcessState;
 
@@ -418,5 +418,5 @@ typedef struct ProcessDescriptor {
 } __attribute__((packed)) ProcessDescriptor;
 
 extern ProcessDescriptor pd[NPROC];
-extern int currentProcess;
+extern uint64 currentProcess;
 #endif
