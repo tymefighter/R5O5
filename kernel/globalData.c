@@ -41,7 +41,7 @@ volatile int errorOccurred = 0;
 // Debug
 // ----------------------------------------------------------------------------
 
-int block_no, off; // current unused log block, offset this current block
+uint64 block_no, off; // current unused log block, offset this current block
 
 // Memory Allocator
 // ----------------------------------------------------------------------------
@@ -49,9 +49,9 @@ int block_no, off; // current unused log block, offset this current block
 // Stack of Pages implemented using a fixed length array
 PageNode pages[NUM_PAGES];
 // Number of Available Free Pages
-int numFreePages;
+uint64 numFreePages;
 // Index of page node at the top of the stack of pages
-int currFreePageNode;
+uint64 currFreePageNode;
 
 // ELF Reader
 // ----------------------------------------------------------------------------
@@ -62,4 +62,4 @@ Elfread elfNodes[ELFSIZE];
 // ----------------------------------------------------------------------------
 
 ProcessDescriptor pd[NPROC];
-int currentProcess = 0;
+uint64 currentProcess = 0;
