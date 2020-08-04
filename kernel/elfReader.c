@@ -62,7 +62,7 @@ void elfReader(
 
         if(ph.memsz < ph.filesz) {flag = 0; break;}
         if(ph.vaddr + ph.memsz < ph.vaddr) {flag = 0; break;}
-        if(ph.vaddr % PGSIZE != 0) {flag = 0; break;}
+        // if(ph.vaddr % PGSIZE != 0) {flag = 0; break;}
         if(cnt >= ELFSIZE) {flag = 0; break;}
 
         // appends a new node in the list at the tail end

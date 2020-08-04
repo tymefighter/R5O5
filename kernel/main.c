@@ -21,6 +21,9 @@ void main() {
     \nfrom the starting of the log blocks\n");
     printf("done !\n");
 
+    createProcess(100, 0, 105, 895);
+    dispatcher();
+
     while(1)
         ; 
 }
