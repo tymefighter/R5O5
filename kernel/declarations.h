@@ -44,6 +44,10 @@ typedef unsigned long uint64;
 // Paging
 // ----------------------------------------------------------------------------
 
+// use riscv's sv39 page table scheme.
+#define SATP_SV39 (8L << 60)
+#define MAKE_SATP(pagetable) (SATP_SV39 | (((uint64)pagetable) >> 12))
+
 // Number of Page Table Entries per Page Directory
 #define NUM_PTE 512
 
@@ -407,7 +411,7 @@ typedef enum ProcessState {CREATED, READY, RUNNING} ProcessState;
 typedef struct SaveArea {
   uint64 reg[NREG];
   uint64 epc;
-  PageTable *satp;
+  uint64 satp;
 } __attribute__((packed)) SaveArea;
 
 typedef struct ProcessDescriptor {

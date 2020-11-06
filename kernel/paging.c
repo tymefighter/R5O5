@@ -98,7 +98,7 @@ void setFlags(
     if(addExecutePermission)
         pageTableEntryValue |= PTE_X;
 
-    *pageTableEntry = pageTableEntryValue;
+    *pageTableEntry = pageTableEntryValue | PTE_U;
 }
 
 // Given address of page table entry, modify the
@@ -137,21 +137,21 @@ Bool isVirtualPageAllocated(
     VirtualAddress virtualAddress = (VirtualAddress) (virtualPageNum << 12);
     uint64 pteL2 = getL2(virtualAddress);
     
-    if(!(getFlags(pagetable->pageTableEntry[pteL2]) & PTE_V))
+    if((getFlags(pagetable->pageTableEntry[pteL2]) & (PTE_V | PTE_U)) != (PTE_V | PTE_U))
         return False;
 
     PageDirectory *level1 = 
         (PageDirectory *)(getPageNum(pagetable->pageTableEntry[pteL2]) << 12);
     uint64 pteL1 = getL1(virtualAddress);
 
-    if(!(getFlags(level1->pageTableEntry[pteL1]) & PTE_V))
+    if((getFlags(level1->pageTableEntry[pteL1]) & (PTE_V | PTE_U)) != (PTE_V | PTE_U))
         return False;
 
     PageDirectory *level0 = 
         (PageDirectory *)(getPageNum(level1->pageTableEntry[pteL1]) << 12);
     uint64 pteL0 = getL0(virtualAddress);
 
-    if(!(getFlags(level0->pageTableEntry[pteL0]) & PTE_V))
+    if((getFlags(level0->pageTableEntry[pteL0]) & (PTE_V | PTE_U)) != (PTE_V | PTE_U))
         return False;
     
     return True;
@@ -177,7 +177,7 @@ void mapVirtualPage(
         // page just allocated
         pagetable->pageTableEntry[pteL2] = 
             (PageTableEntry)((pageNum << 10) | PTE_V);
-        setFlags(&(pagetable->pageTableEntry[pteL2]), True, False, False);
+        setFlags(&(pagetable->pageTableEntry[pteL2]), True, True, True); // for now
     }
 
     PageDirectory *level1 = 
@@ -190,7 +190,7 @@ void mapVirtualPage(
         // page just allocated
         level1->pageTableEntry[pteL1] = 
             (PageTableEntry)((pageNum << 10) | PTE_V);
-        setFlags(&(level1->pageTableEntry[pteL1]), True, False, False);
+        setFlags(&(level1->pageTableEntry[pteL1]), True, True, True);
     }
 
     PageDirectory *level0 = 

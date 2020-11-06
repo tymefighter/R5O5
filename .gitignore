@@ -9,3 +9,6 @@ mkfs/r5o5_mkfs
 getLogInfo
 information/prog_info
 fs.img
+user/*.o
+user/testUser
+.gdbinit

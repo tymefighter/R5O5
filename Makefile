@@ -86,7 +86,7 @@ $U/_%: $U/%.o $(ULIB)
 mkfs/r5o5_mkfs: mkfs/r5o5_mkfs.c
 	gcc -o mkfs/r5o5_mkfs mkfs/r5o5_mkfs.c
 
-UPROGS := 
+UPROGS := $U/testUser
 
 fs.img: mkfs/r5o5_mkfs $(UPROGS)
 	mkfs/r5o5_mkfs fs.img $(UPROGS)
@@ -106,7 +106,8 @@ clean:
 	$(UPROGS) \
 	$U/*.d $U/*.o $U/*.sym $U/*.asm \
 	getLogInfo \
-	information/prog_info
+	information/prog_info \
+	user/*.o
 
 # try to generate a unique GDB port
 GDBPORT = $(shell expr `id -u` % 5000 + 25000)

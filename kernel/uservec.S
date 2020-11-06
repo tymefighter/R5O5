@@ -82,6 +82,7 @@ userret:
         # userInterruptReturn() calls here.
 
         la a0, pd		    # process table base address
+        la t0, currentProcess  # get Address of currentProcess global variable
         ld t0, 0(t0)
     	li t1, 280		    # size of an entry in pd is 280 bytes
     	mul t0, t0, t1
